@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador Online con IA - Examen de Conducir Argentina</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f0f4f8;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 800px;
+            padding: 30px;
+            box-sizing: border-box;
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #00a1b2;
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            color: #005a7d;
+            margin: 0;
+        }
+
+        #start-screen, #results-container {
+            text-align: center;
+        }
+
+        #start-screen p {
+            font-size: 1.1em;
+            line-height: 1.6;
+        }
+        
+        #start-btn, #restart-btn {
+            background-color: #00a1b2;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2em;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 20px;
+        }
+
+        #start-btn:hover, #restart-btn:hover {
+            background-color: #007b8a;
+        }
+
+        #quiz-container {
+            display: none;
+        }
+
+        #question-counter {
+            font-size: 1em;
+            font-weight: 500;
+            color: #555;
+            margin-bottom: 15px;
+        }
+
+        #image-container {
+            min-height: 200px;
+            max-height: 250px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 15px auto;
+            border: 1px dashed #ccc;
+            border-radius: 8px;
+            padding: 10px;
+        }
+        
+        #image-container svg {
+            max-width: 100%;
+            max-height: 200px;
+        }
+
+        #loading-indicator {
+            font-style: italic;
+            color: #007b8a;
+        }
+
+        #question-text {
+            font-size: 1.4em;
+            font-weight: 700;
+            margin-bottom: 25px;
+        }
+
+        #answer-options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .option {
+            background-color: #f8f9fa;
+            border: 2px solid #dee2e6;
+            padding: 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: left;
+        }
+
+        .option.disabled {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        .option:hover:not(.disabled) {
+            background-color: #e9ecef;
+            border-color: #00a1b2;
+        }
+        
+        .option.selected {
+            background-color: #d1ecf1;
+            border-color: #007b8a;
+            font-weight: 500;
+        }
+
+        #results-container {
+            display: none;
+        }
+
+        #score-text {
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .score-pass { color: #28a745; }
+        .score-fail { color: #dc3545; }
+
+        #review-list {
+            list-style: none;
+            padding: 0;
+            text-align: left;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        #review-list li {
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-left: 5px solid;
+        }
+        
+        #review-list li.correct { border-color: #28a745; }
+        #review-list li.incorrect { border-color: #dc3545; }
+        .question-review { font-weight: bold; margin-bottom: 8px; }
+        .answer-review { margin-top: 8px; }
+        .review-image-container {
+            max-width: 150px;
+            margin-top: 10px;
+        }
+        .review-image-container svg {
+            width: 100%;
+            height: auto;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Simulador Online con IA - Examen de Conducir</h1>
+            <p>Basado en el Curso Nacional de Educación Vial Digital</p>
+        </div>
+
+        <div id="start-screen">
+            <h2>¡Listo para practicar!</h2>
+            <p>
+                Este examen consta de 40 preguntas aleatorias de un banco de más de 80. Las imágenes se generarán al instante usando la IA de Gemini.
+                <br>¡Mucha suerte!
+            </p>
+            <button id="start-btn">Comenzar Examen</button>
+        </div>
+
+        <div id="quiz-container">
+            <div id="question-counter"></div>
+            <div id="image-container">
+                <div id="loading-indicator" style="display: none;"></div>
+            </div>
+            <div id="question-text"></div>
+            <div id="answer-options"></div>
+        </div>
+
+        <div id="results-container">
+            <h2>Resultados del Examen</h2>
+            <div id="score-text"></div>
+            <p id="score-message"></p>
+            <h3>Revisión de Respuestas</h3>
+            <ul id="review-list"></ul>
+            <button id="restart-btn">Intentar Nuevo Examen</button>
+        </div>
+    </div>
+
+<script>
+const allQuestions = [
+    // --- Preguntas con Imagen (Prompts para Gemini para generar SVG) ---
+    {
+        question: "La señal que se muestra, ¿qué indica?",
+        prompt: "Generate the clean SVG code for a 'Contramano' (No Entry) traffic sign. It should be a red circle with a white horizontal rectangle in the center. Argentinian road sign style. The SVG should be responsive.",
+        options: ["Giro obligatorio", "Prohibición de avanzar (Contramano)", "Calle sin salida", "Estacionamiento exclusivo"],
+        correctAnswer: "Prohibición de avanzar (Contramano)"
+    },
+    {
+        question: "Al ver esta señal octogonal en una esquina, ¿qué debe hacer?",
+        prompt: "Generate the clean SVG code for a 'PARE' (STOP) traffic sign. It must be a red octagon with the word 'PARE' in bold, white, sans-serif letters in the center. Argentinian road sign style. The SVG should be responsive.",
+        options: ["Disminuir la velocidad y ceder el paso", "Tener precaución por cruce de peatones", "Detener completamente la marcha y luego avanzar", "Continuar con la misma velocidad"],
+        correctAnswer: "Detener completamente la marcha y luego avanzar"
+    },
+    {
+        question: "Esta señal triangular con borde rojo indica que debe:",
+        prompt: "Generate the clean SVG code for a 'CEDA EL PASO' (Yield) traffic sign. It must be an inverted equilateral triangle with a thick red border and a white background. Argentinian road sign style. The SVG should be responsive.",
+        options: ["Detenerse obligatoriamente", "Acelerar para pasar primero", "Ceder el paso a los vehículos de la vía transversal", "Girar a la derecha"],
+        correctAnswer: "Ceder el paso a los vehículos de la vía transversal"
+    },
+    {
+        question: "Esta señal amarilla de advertencia le previene sobre:",
+        prompt: "Generate the clean SVG code for a preventive 'S-Curve' traffic sign. It must be a yellow diamond shape with a black border, containing a black winding arrow indicating a curve to the right then a curve to the left. Argentinian road sign style. The SVG should be responsive.",
+        options: ["Un cruce de caminos", "Una curva en S", "Calzada resbaladiza", "Estrechamiento de calzada"],
+        correctAnswer: "Una curva en S"
+    },
+    {
+        question: "En esta situación de cruce sin señalizar, ¿qué vehículo tiene la prioridad de paso?",
+        prompt: "Generate a simple, clear, top-down SVG diagram of a street intersection. A red car is approaching from the bottom. A grey car is approaching from the left. The grey car is on the red car's right-hand side. The style must be a schematic for a driving test.",
+        options: ["El coche rojo, porque va derecho", "El coche gris, porque viene por la derecha del rojo", "El que llegue primero a la intersección", "Ambos deben frenar y hacerse señas"],
+        correctAnswer: "El coche gris, porque viene por la derecha del rojo"
+    },
+    {
+        question: "La demarcación horizontal de doble línea amarilla continua indica:",
+        prompt: "Generate a simple SVG diagram showing a driver's perspective of a two-lane road with a solid double yellow line in the center, separating traffic in opposite directions. The style should be clear and schematic.",
+        options: ["Zona de adelantamiento permitido para ambos carriles", "Línea de detención antes de una esquina", "Prohibición de adelantamiento para ambos carriles", "Separación de carriles del mismo sentido"],
+        correctAnswer: "Prohibición de adelantamiento para ambos carriles"
+    },
+    {
+        question: "¿Qué indica esta señal de advertencia?",
+        prompt: "Generate the clean SVG code for a preventive 'School Zone' traffic sign. It must be a yellow diamond shape with a black border, containing black silhouettes of two children walking. Argentinian road sign style. The SVG should be responsive.",
+        options: ["Cruce de peatones adultos", "Proximidad de una plaza", "Proximidad de zona escolar o presencia de niños", "Campamento cercano"],
+        correctAnswer: "Proximidad de zona escolar o presencia de niños"
+    },
+    {
+        question: "Esta señal azul le informa sobre:",
+        prompt: "Generate the clean SVG code for an 'Estación de Servicio' (Gas Station) information sign. It must be a blue square with a white pictogram of a fuel pump. Argentinian road sign style. The SVG should be responsive.",
+        options: ["Un taller mecánico", "Una zona de descanso", "La proximidad de una estación de servicio", "Un puesto de control policial"],
+        correctAnswer: "La proximidad de una estación de servicio"
+    },
+    {
+        question: "La señal en la imagen prohíbe:",
+        prompt: "Generate the clean SVG code for a 'No U-Turn' regulatory sign. It must be a circle with a red border, white background, and a black arrow making a 180-degree turn, crossed out with a red diagonal line. Argentinian style.",
+        options: ["Girar a la izquierda", "Cambiar de carril", "Girar en 'U' o retomar", "Adelantar a otros vehículos"],
+        correctAnswer: "Girar en 'U' o retomar"
+    },
+    {
+        question: "Esta demarcación horizontal se conoce como:",
+        prompt: "Generate a simple SVG diagram showing a street with a pedestrian crossing (zebra crossing) painted on it, consisting of wide white parallel stripes.",
+        options: ["Línea de borde de calzada", "Senda peatonal", "Divisoria de carriles", "Carril exclusivo de buses"],
+        correctAnswer: "Senda peatonal"
+    },
+    {
+        question: "Esta señal reglamentaria circular con un número 60, ¿qué indica?",
+        prompt: "Generate the clean SVG code for a 'Maximum Speed Limit' traffic sign. It must be a circle with a thick red border, a white background, and the number '60' in black, bold, sans-serif font in the center. Argentinian style.",
+        options: ["Velocidad mínima 60 km/h", "Velocidad máxima 60 km/h", "Ruta Nacional 60", "Distancia al próximo pueblo: 60 km"],
+        correctAnswer: "Velocidad máxima 60 km/h"
+    },
+    {
+        question: "¿Qué significa esta señal informativa de fondo verde?",
+        prompt: "Generate the clean SVG code for an 'Inicio de Autopista' (Motorway Begins) information sign. It must be a green rectangle with a white pictogram of a motorway with a bridge over it. Argentinian road sign style.",
+        options: ["Prohibido circular por autopista", "Puente en reparación", "Inicio de autopista", "Fin de autopista"],
+        correctAnswer: "Inicio de autopista"
+    },
+    {
+        question: "Esta señal transitoria de color naranja advierte sobre:",
+        prompt: "Generate the clean SVG code for a temporary 'Men at Work' road sign. It must be a diamond shape with an orange background and a black border, containing a black silhouette of a worker with a shovel. Argentinian road work sign style.",
+        options: ["Fin de la construcción", "Proximidad de una escuela", "Hombres trabajando en la calzada", "Cruce de peatones"],
+        correctAnswer: "Hombres trabajando en la calzada"
+    },
+    // --- Preguntas sin Imagen ---
+    {
+        question: "Según la Ley 24.449, ¿cuál es la edad mínima para obtener la licencia clase C, D y E (profesionales)?",
+        options: ["18 años", "20 años", "21 años", "25 años"],
+        correctAnswer: "21 años"
+    },
+    {
+        question: "El conjunto de sistemas del vehículo que ayudan a reducir las consecuencias de un siniestro (como cinturón de seguridad y airbag) se conoce como:",
+        options: ["Seguridad pasiva", "Seguridad activa", "Seguridad preventiva", "Seguridad terciaria"],
+        correctAnswer: "Seguridad pasiva"
+    },
+    {
+        question: "En una encrucijada sin señalizar, un vehículo de emergencia (ambulancia, policía) con las sirenas y balizas encendidas:",
+        options: ["Tiene prioridad de paso sobre los demás", "Debe respetar la prioridad de la derecha", "Debe esperar al resto de los vehículos", "Tiene prioridad solo si circula por una avenida"],
+        correctAnswer: "Tiene prioridad de paso sobre los demás"
+    },
+    {
+        question: "La Revisión Técnica Obligatoria (RTO) para un vehículo particular con más de 7 años de antigüedad tiene una vigencia de:",
+        options: ["24 meses", "18 meses", "12 meses", "6 meses"],
+        correctAnswer: "12 meses"
+    },
+    {
+        question: "En Argentina, ¿cuál es el límite máximo de alcoholemia permitido para conductores de motocicletas?",
+        options: ["0.5 g/l de sangre", "0.2 g/l de sangre", "0.0 g/l de sangre", "0.8 g/l de sangre"],
+        correctAnswer: "0.2 g/l de sangre"
+    },
+    {
+        question: "¿Es obligatorio en Argentina circular en rutas nacionales con las luces bajas encendidas durante el día?",
+        options: ["Sí, siempre", "No, solo de noche o con poca visibilidad", "Solo en rutas provinciales", "Solo si el vehículo no tiene luces DRL"],
+        correctAnswer: "Sí, siempre"
+    },
+    {
+        question: "El fenómeno por el cual los neumáticos pierden adherencia sobre una calzada mojada se denomina:",
+        options: ["Desgaste anormal", "Efecto túnel", "Aquaplaning", "Subviraje"],
+        correctAnswer: "Aquaplaning"
+    },
+    {
+        question: "Al circular por una rotonda, ¿quién tiene prioridad?",
+        options: ["Quien ingresa a la rotonda", "Quien ya se encuentra circulando dentro de la rotonda", "El vehículo que viene por la derecha", "El transporte público"],
+        correctAnswer: "Quien ya se encuentra circulando dentro de la rotonda"
+    },
+    {
+        question: "Para una conducción eficiente, ¿qué se recomienda hacer en una bajada prolongada?",
+        options: ["Bajar en punto muerto (neutro) para ahorrar combustible", "Usar el freno de manera constante y suave", "Utilizar un cambio bajo (freno motor) para controlar la velocidad", "Acelerar para salir rápido de la pendiente"],
+        correctAnswer: "Utilizar un cambio bajo (freno motor) para controlar la velocidad"
+    },
+    {
+        question: "La distancia de seguridad recomendada en ciudad (a 50 km/h) es de al menos:",
+        options: ["10 metros", "30 metros o 2 segundos", "50 metros", "La longitud de un auto"],
+        correctAnswer: "30 metros o 2 segundos"
+    },
+    {
+        question: "El uso del cinturón de seguridad es obligatorio para:",
+        options: ["Solo el conductor", "El conductor y el acompañante", "Solo los pasajeros de los asientos traseros", "Todos los ocupantes del vehículo"],
+        correctAnswer: "Todos los ocupantes del vehículo"
+    },
+    {
+        question: "Al realizar un adelantamiento a otro vehículo, la maniobra se debe hacer:",
+        options: ["Por la derecha", "Por la banquina", "Por la izquierda", "Por donde haya más espacio"],
+        correctAnswer: "Por la izquierda"
+    },
+    {
+        question: "¿Cuál es la velocidad máxima permitida en una avenida en zona urbana, si no hay señalización que indique lo contrario?",
+        options: ["40 km/h", "50 km/h", "60 km/h", "70 km/h"],
+        correctAnswer: "60 km/h"
+    },
+    {
+        question: "¿Cuál es la velocidad máxima permitida en una calle en zona urbana?",
+        options: ["60 km/h", "50 km/h", "40 km/h", "30 km/h"],
+        correctAnswer: "40 km/h"
+    },
+    {
+        question: "El apoya cabezas es un elemento de seguridad que protege principalmente contra:",
+        options: ["Golpes frontales", "Lesiones en las piernas", "El 'efecto latigazo' en las cervicales", "Deslizamiento del cuerpo"],
+        correctAnswer: "El 'efecto latigazo' en las cervicales"
+    },
+    {
+        question: "La sigla P.A.S. en primeros auxilios significa:",
+        options: ["Parar, Ayudar, Socorrer", "Proteger, Avisar, Socorrer", "Prevenir, Actuar, Salvar", "Paciencia, Asistencia, Seguridad"],
+        correctAnswer: "Proteger, Avisar, Socorrer"
+    },
+    {
+        question: "Si revienta un neumático trasero mientras conduce, ¿qué es lo más seguro hacer?",
+        options: ["Frenar bruscamente y girar el volante", "Acelerar para estabilizar el vehículo", "Sujetar firmemente el volante, levantar suavemente el pie del acelerador y corregir la trayectoria", "Poner el auto en punto muerto y llamar a emergencias"],
+        correctAnswer: "Sujetar firmemente el volante, levantar suavemente el pie del acelerador y corregir la trayectoria"
+    },
+    {
+        question: "El uso del teléfono celular mientras se conduce:",
+        options: ["Está permitido si se usa el altavoz", "Está prohibido, ya que disminuye la atención", "Está permitido en semáforos en rojo", "Solo está prohibido para enviar mensajes"],
+        correctAnswer: "Está prohibido, ya que disminuye la atención"
+    },
+    {
+        question: "Un conductor de motocicleta, ¿tiene permitido circular entre dos vehículos en movimiento?",
+        options: ["Sí, para agilizar el tránsito", "No, está prohibido", "Solo si los autos están detenidos", "Sí, si la avenida tiene más de dos carriles"],
+        correctAnswer: "No, está prohibido"
+    },
+    {
+        question: "¿Cuál es la finalidad principal del sistema de frenos ABS?",
+        options: ["Frenar más rápido", "Evitar el bloqueo de las ruedas durante una frenada brusca", "Reducir el desgaste de las pastillas", "Frenar automáticamente ante un obstáculo"],
+        correctAnswer: "Evitar el bloqueo de las ruedas durante una frenada brusca"
+    },
+    {
+        question: "Los niños de hasta 10 años, ¿dónde deben viajar?",
+        options: ["En el asiento delantero con cinturón", "En el asiento trasero, con el Sistema de Retención Infantil correspondiente", "En cualquier asiento, pero con un adulto al lado", "En el asiento del acompañante si es alto"],
+        correctAnswer: "En el asiento trasero, con el Sistema de Retención Infantil correspondiente"
+    },
+    {
+        question: "El conductor que circula por una vía pavimentada tiene prioridad sobre el que proviene de una de tierra. ¿Verdadero o Falso?",
+        options: ["Verdadero", "Falso"],
+        correctAnswer: "Verdadero"
+    },
+    {
+        question: "La velocidad mínima en una autopista es:",
+        options: ["La mitad de la máxima establecida para esa vía", "60 km/h", "80 km/h", "No hay velocidad mínima"],
+        correctAnswer: "La mitad de la máxima establecida para esa vía"
+    },
+    {
+        question: "¿Qué significa una señal redonda con borde rojo y fondo blanco?",
+        options: ["Prevención", "Información", "Reglamentación (prohibición o restricción)", "Fin de la prescripción"],
+        correctAnswer: "Reglamentación (prohibición o restricción)"
+    },
+    {
+        question: "La 'conducción a la defensiva' significa:",
+        options: ["Conducir rápido para evitar estar en riesgo", "Anticiparse a los posibles errores de los demás y a las condiciones del entorno", "Ceder siempre el paso, aunque se tenga prioridad", "No usar nunca la bocina"],
+        correctAnswer: "Anticiparse a los posibles errores de los demás y a las condiciones del entorno"
+    },
+    {
+        question: "¿Cuál es el objetivo de la Licencia Nacional de Conducir (LNC)?",
+        options: ["Recaudar fondos para el estado", "Unificar los criterios y requisitos para la obtención del permiso de conducir en todo el país", "Controlar la cantidad de conductores", "Facilitar los trámites en el registro automotor"],
+        correctAnswer: "Unificar los criterios y requisitos para la obtención del permiso de conducir en todo el país"
+    },
+    {
+        question: "El peatón tiene prioridad de cruce:",
+        options: ["Solamente en las esquinas con semáforo peatonal en verde", "En la senda peatonal y en las esquinas", "Siempre, en cualquier parte de la calzada", "Solo si levanta la mano para indicar su intención"],
+        correctAnswer: "En la senda peatonal y en las esquinas"
+    },
+    {
+        question: "La sanción de 'inhabilitación' implica:",
+        options: ["El pago de una multa económica", "La realización de un curso de reeducación vial", "La pérdida del privilegio de conducir por un tiempo determinado", "El secuestro del vehículo"],
+        correctAnswer: "La pérdida del privilegio de conducir por un tiempo determinado"
+    },
+    {
+        question: "¿A qué se considera 'velocidad precautoria'?",
+        options: ["A la velocidad máxima permitida en la vía", "A una velocidad que permita tener siempre el total dominio del vehículo", "A circular siempre 10 km/h por debajo de la máxima", "A la velocidad que indica el GPS"],
+        correctAnswer: "A una velocidad que permita tener siempre el total dominio del vehículo"
+    },
+    {
+        question: "¿Qué clase de licencia se necesita para conducir automóviles y camionetas de uso particular hasta 3.500 kg?",
+        options: ["Clase A", "Clase B.1", "Clase C", "Clase D"],
+        correctAnswer: "Clase B.1"
+    },
+    {
+        question: "En caso de un siniestro vial sin heridos, ¿cuál es el plazo para realizar la denuncia ante la compañía de seguros?",
+        options: ["24 horas", "48 horas", "72 horas (3 días)", "Una semana"],
+        correctAnswer: "72 horas (3 días)"
+    },
+    {
+        question: "¿Está permitido estacionar un vehículo sobre la senda peatonal?",
+        options: ["Sí, si es por menos de 5 minutos", "Solo para ascenso y descenso de pasajeros", "No, está prohibido", "Sí, si no se obstruye completamente"],
+        correctAnswer: "No, está prohibido"
+    },
+    {
+        question: "Una línea blanca continua en la calzada indica:",
+        options: ["Que se puede cambiar de carril con precaución", "Que no se debe cruzar ni cambiar de carril", "El inicio de una zona de estacionamiento medido", "Un carril preferencial para bicicletas"],
+        correctAnswer: "Que no se debe cruzar ni cambiar de carril"
+    },
+    {
+        question: "La fatiga al conducir es peligrosa porque:",
+        options: ["Aumenta el consumo de combustible", "Disminuye el tiempo de reacción y la capacidad de atención", "Desgasta los neumáticos más rápido", "Genera multas de tránsito"],
+        correctAnswer: "Disminuye el tiempo de reacción y la capacidad de atención"
+    },
+    {
+        question: "¿Qué elemento de seguridad es obligatorio llevar en el vehículo, además del matafuegos?",
+        options: ["Un botiquín de primeros auxilios", "Un chaleco reflectante", "Ambas balizas portátiles normalizadas", "Una caja de herramientas completa"],
+        correctAnswer: "Ambas balizas portátiles normalizadas"
+    },
+    {
+        question: "Si un semáforo cambia de verde a amarillo, usted debe:",
+        options: ["Acelerar para cruzar antes de que se ponga en rojo", "Detenerse, si es posible hacerlo con seguridad, antes de la línea de cruce", "Continuar la marcha normalmente", "Frenar bruscamente sin importar el vehículo de atrás"],
+        correctAnswer: "Detenerse, si es posible hacerlo con seguridad, antes de la línea de cruce"
+    }
+];
+
+const startScreen = document.getElementById('start-screen');
+const quizContainer = document.getElementById('quiz-container');
+const resultsContainer = document.getElementById('results-container');
+const startBtn = document.getElementById('start-btn');
+const restartBtn = document.getElementById('restart-btn');
+
+const questionCounterElem = document.getElementById('question-counter');
+const imageContainerElem = document.getElementById('image-container');
+const questionImageElem = document.getElementById('question-image');
+const questionTextElem = document.getElementById('question-text');
+const answerOptionsElem = document.getElementById('answer-options');
+const scoreTextElem = document.getElementById('score-text');
+const scoreMessageElem = document.getElementById('score-message');
+const reviewListElem = document.getElementById('review-list');
+
+let shuffledQuestions, currentQuestionIndex, score, userAnswers;
+const EXAM_LENGTH = 40;
+const USED_QUESTIONS_KEY = 'usedDrivingTestQuestions';
+
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+}
+
+function getUsedQuestions() {
+    const used = sessionStorage.getItem(USED_QUESTIONS_KEY);
+    return used ? JSON.parse(used) : [];
+}
+
+function setUsedQuestions(questions) {
+    const used = getUsedQuestions();
+    const newUsed = [...used, ...questions.map(q => q.question)];
+    sessionStorage.setItem(USED_QUESTIONS_KEY, JSON.stringify(newUsed));
+}
+
+function startQuiz() {
+    startScreen.style.display = 'none';
+    resultsContainer.style.display = 'none';
+    quizContainer.style.display = 'block';
+
+    const usedQuestions = getUsedQuestions();
+    let availableQuestions = allQuestions.filter(q => !usedQuestions.includes(q.question));
+
+    if (availableQuestions.length < EXAM_LENGTH) {
+        sessionStorage.removeItem(USED_QUESTIONS_KEY);
+        availableQuestions = allQuestions;
+    }
+
+    shuffleArray(availableQuestions);
+    shuffledQuestions = availableQuestions.slice(0, EXAM_LENGTH);
+    setUsedQuestions(shuffledQuestions);
+    
+    currentQuestionIndex = 0;
+    score = 0;
+    userAnswers = [];
+
+    showQuestion();
+}
+
+function showQuestion() {
+    resetState();
+    const currentQuestion = shuffledQuestions[currentQuestionIndex];
+    questionCounterElem.textContent = `Pregunta ${currentQuestionIndex + 1} de ${EXAM_LENGTH}`;
+    questionTextElem.textContent = currentQuestion.question;
+
+    if (currentQuestion.imageBase64) {
+        imageContainerElem.style.display = 'flex';
+        questionImageElem.src = currentQuestion.imageBase64;
+    } else {
+        imageContainerElem.style.display = 'none';
+    }
+
+    currentQuestion.options.forEach(optionText => {
+        const optionElement = document.createElement('div');
+        optionElement.classList.add('option');
+        optionElement.textContent = optionText;
+        optionElement.addEventListener('click', () => selectAnswer(optionText, optionElement));
+        answerOptionsElem.appendChild(optionElement);
+    });
+}
+
+function resetState() {
+    answerOptionsElem.innerHTML = '';
+}
+
+function selectAnswer(selectedOptionText, selectedOptionElement) {
+    if (document.querySelector('.option.selected')) return;
+    
+    selectedOptionElement.classList.add('selected');
+
+    const currentQuestion = shuffledQuestions[currentQuestionIndex];
+    const isCorrect = selectedOptionText === currentQuestion.correctAnswer;
+    
+    if (isCorrect) score++;
+
+    userAnswers.push({
+        question: currentQuestion.question,
+        imageBase64: currentQuestion.imageBase64 || null,
+        userAnswer: selectedOptionText,
+        correctAnswer: currentQuestion.correctAnswer,
+        isCorrect: isCorrect
+    });
+
+    setTimeout(() => {
+        currentQuestionIndex++;
+        if (currentQuestionIndex < EXAM_LENGTH) {
+            showQuestion();
+        } else {
+            showResults();
+        }
+    }, 500);
+}
+
+function showResults() {
+    quizContainer.style.display = 'none';
+    resultsContainer.style.display = 'block';
+
+    const finalScore = Math.round((score / EXAM_LENGTH) * 100);
+    scoreTextElem.textContent = `${finalScore} Puntos`;
+    reviewListElem.innerHTML = '';
+
+    if (finalScore >= 70) {
+        scoreTextElem.classList.add('score-pass');
+        scoreMessageElem.textContent = '¡Felicitaciones, has APROBADO!';
+    } else {
+        scoreTextElem.classList.add('score-fail');
+        scoreMessageElem.textContent = 'Has DESAPROBADO. ¡Sigue practicando!';
+    }
+    
+    userAnswers.forEach((answer, index) => {
+        const li = document.createElement('li');
+        li.classList.add(answer.isCorrect ? 'correct' : 'incorrect');
+
+        let reviewHTML = `<div class="question-review">${index + 1}. ${answer.question}</div>`;
+        
+        if (answer.imageBase64) {
+            reviewHTML += `<img src="${answer.imageBase64}" class="review-image" alt="Imagen de la pregunta">`;
+        }
+
+        if (answer.isCorrect) {
+            reviewHTML += `<div class="answer-review">✔️ Tu respuesta: ${answer.userAnswer}</div>`;
+        } else {
+            reviewHTML += `<div class="answer-review">❌ Tu respuesta: ${answer.userAnswer}</div>`;
+            reviewHTML += `<div class="answer-review">Respuesta correcta: ${answer.correctAnswer}</div>`;
+        }
+        
+        li.innerHTML = reviewHTML;
+        reviewListElem.appendChild(li);
+    });
+}
+
+startBtn.addEventListener('click', startQuiz);
+restartBtn.addEventListener('click', startQuiz);
+
+</script>
+</body>
+</html>
