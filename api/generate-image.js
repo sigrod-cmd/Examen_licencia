@@ -10,21 +10,23 @@ export default async function handler(req, res) {
   }
 
   try {
-    const urlGemini = 'https://api.gemini.example.com/generate-image';
+    // URL base sin la clave
+    const urlGemini = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
 
-    // Obtenemos la clave API desde la variable de entorno
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
-      throw new Error('La clave API no está configurada en las variables de entorno');
+      return res.status(500).json({ error: 'Clave API no configurada' });
     }
 
-    const resultado = await llamarApiGemini(urlGemini, { prompt }, apiKey);
+    const fullUrl = `${urlGemini}?key=${apiKey}`;
+
+    const resultado = await llamarApiGemini(fullUrl, { prompt });
 
     if (!resultado) {
       return res.status(500).json({ error: 'No se obtuvo resultado válido de Gemini' });
     }
 
-    return res.status(200).json({ image: resultado.image });
+    return res.status(200).json({ image: resultado });
 
   } catch (error) {
     console.error('Error en /api/generate-image:', error);
@@ -32,26 +34,23 @@ export default async function handler(req, res) {
   }
 }
 
-async function llamarApiGemini(url, payload, apiKey) {
+async function llamarApiGemini(url, payload) {
   try {
     const response = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,  // Usamos la clave API aquí
       },
       body: JSON.stringify(payload)
     });
 
     if (!response.ok) {
-      throw new Error(`Error en la llamada a Gemini: ${response.status} ${response.statusText}`);
+      const errorText = await response.text();
+      console.error('Error en respuesta de Gemini:', errorText);
+      throw new Error(`Error en llamada a Gemini: ${response.status} ${response.statusText}`);
     }
 
     const data = await response.json();
-
-    if (!data || !data.image) {
-      throw new Error('Respuesta inválida o incompleta desde Gemini');
-    }
 
     return data;
   } catch (error) {
