@@ -10,7 +10,6 @@ export default async function handler(req, res) {
   }
 
   try {
-    // URL base sin la clave
     const urlGemini = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
 
     const apiKey = process.env.GEMINI_API_KEY;
@@ -20,41 +19,46 @@ export default async function handler(req, res) {
 
     const fullUrl = `${urlGemini}?key=${apiKey}`;
 
-    const resultado = await llamarApiGemini(fullUrl, { prompt });
-
-    if (!resultado) {
-      return res.status(500).json({ error: 'No se obtuvo resultado válido de Gemini' });
-    }
-
-    return res.status(200).json({ image: resultado });
-
-  } catch (error) {
-    console.error('Error en /api/generate-image:', error);
-    return res.status(500).json({ error: 'Error interno del servidor' });
-  }
-}
-
-async function llamarApiGemini(url, payload) {
-  try {
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
+    const bodyPayload = {
+      prompt: {
+        messages: [
+          {
+            author: "user",
+            content: {
+              text: prompt
+            }
+          }
+        ]
       },
-      body: JSON.stringify(payload)
+      temperature: 0.7,
+      candidateCount: 1
+    };
+
+    const response = await fetch(fullUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(bodyPayload)
     });
 
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Error en respuesta de Gemini:', errorText);
-      throw new Error(`Error en llamada a Gemini: ${response.status} ${response.statusText}`);
+      const textError = await response.text();
+      console.error('Error API Gemini:', textError);
+      return res.status(response.status).json({ error: textError });
     }
 
     const data = await response.json();
 
-    return data;
+    // Ejemplo: extraer el texto generado del resultado
+    const generatedText = data.candidates?.[0]?.content?.text || null;
+
+    if (!generatedText) {
+      return res.status(500).json({ error: 'No se recibió contenido generado' });
+    }
+
+    return res.status(200).json({ content: generatedText });
+
   } catch (error) {
-    console.error('Error llamando a Gemini:', error);
-    throw error;
+    console.error('Error en /api/generate-image:', error);
+    return res.status(500).json({ error: 'Error interno del servidor' });
   }
 }
