@@ -1,11 +1,15 @@
-// Usamos 'node-fetch' para hacer llamadas a la API desde el servidor
+// Este archivo debe estar en la carpeta /api/
 const fetch = require('node-fetch');
 
 module.exports = async (req, res) => {
-    // Obtenemos el "prompt" que nos envía el front-end
+    // Verificamos que la petición sea POST para más seguridad
+    if (req.method !== 'POST') {
+        return res.status(405).json({ error: 'Método no permitido' });
+    }
+
     const { prompt } = req.body;
 
-    // La clave API la leemos de una variable de entorno segura, NUNCA la escribimos aquí
+    // La clave API se lee de una variable de entorno segura en el servidor (Vercel, Netlify, etc.)
     const apiKey = process.env.GEMINI_API_KEY;
 
     if (!prompt) {
@@ -15,10 +19,11 @@ module.exports = async (req, res) => {
         return res.status(500).json({ error: "La clave API no está configurada en el servidor." });
     }
 
+    // Usamos el modelo gemini-pro que es más estable para generar texto (código SVG)
     const API_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`;
     
     const requestBody = {
-        "contents": [{ "parts": [{ "text": `Generate the clean SVG code for: ${prompt}. The SVG should be responsive, start with <svg> and end with </svg>. Do not include any other text or markdown characters like \`\`\`.` }] }],
+        "contents": [{ "parts": [{ "text": `Generate only the clean SVG code for: ${prompt}. The SVG should be responsive, start with <svg> and end with </svg>. Do not include any other text, markdown characters like \`\`\`, or explanations.` }] }],
     };
 
     try {
