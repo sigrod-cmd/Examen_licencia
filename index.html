@@ -3,78 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador Profesional Responsivo - Examen de Conducir Argentina</title>
+    <title>Simulador Profesional con Temporizador - Examen de Conducir Argentina</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+        body { font-family: 'Roboto', sans-serif; background-color: #f0f4f8; color: #333; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; box-sizing: border-box; }
+        .container { background-color: #ffffff; border-radius: 10px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); width: 100%; max-width: 800px; padding: 30px; box-sizing: border-box; }
+        .header { text-align: center; border-bottom: 2px solid #00a1b2; padding-bottom: 20px; margin-bottom: 20px; }
+        .header h1 { color: #005a7d; margin: 0; font-size: 2em; }
+        .header p { font-size: 1em; color: #555; }
+        #start-screen, #results-container { text-align: center; }
+        #start-screen p { font-size: 1.1em; line-height: 1.6; }
+        #start-btn, #restart-btn { background-color: #00a1b2; color: white; border: none; padding: 15px 30px; font-size: 1.2em; border-radius: 5px; cursor: pointer; transition: background-color 0.3s; margin-top: 20px; font-weight: 700; }
+        #start-btn:hover, #restart-btn:hover { background-color: #007b8a; }
+        #quiz-container { display: none; }
         
-        /* --- Estilos Base para todos los dispositivos --- */
-        body { 
-            font-family: 'Roboto', sans-serif; 
-            background-color: #f0f4f8; 
-            color: #333; 
-            margin: 0; 
-            padding: 20px; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            min-height: 100vh;
-            box-sizing: border-box;
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
         }
-        .container { 
-            background-color: #ffffff; 
-            border-radius: 10px; 
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); 
-            width: 100%; 
-            max-width: 800px; 
-            padding: 30px; 
-            box-sizing: border-box; 
-        }
-        .header { 
-            text-align: center; 
-            border-bottom: 2px solid #00a1b2; 
-            padding-bottom: 20px; 
-            margin-bottom: 20px; 
-        }
-        .header h1 { 
-            color: #005a7d; 
-            margin: 0; 
-            font-size: 2em;
-        }
-        .header p {
-            font-size: 1em;
-            color: #555;
-        }
-        #start-screen, #results-container { 
-            text-align: center; 
-        }
-        #start-screen p { 
-            font-size: 1.1em; 
-            line-height: 1.6; 
-        }
-        #start-btn, #restart-btn { 
-            background-color: #00a1b2; 
-            color: white; 
-            border: none; 
-            padding: 15px 30px; 
-            font-size: 1.2em; 
-            border-radius: 5px; 
-            cursor: pointer; 
-            transition: background-color 0.3s; 
-            margin-top: 20px;
-            font-weight: 700;
-        }
-        #start-btn:hover, #restart-btn:hover { 
-            background-color: #007b8a; 
-        }
-        #quiz-container { 
-            display: none; 
-        }
+
         #question-counter { 
             font-size: 1em; 
             font-weight: 500; 
             color: #555; 
-            margin-bottom: 15px; 
         }
+
+        #timer {
+            font-size: 1.1em;
+            font-weight: 700;
+            color: #005a7d;
+            background-color: #e0f7fa;
+            padding: 5px 15px;
+            border-radius: 20px;
+        }
+
         #question-text { 
             font-size: 1.4em; 
             font-weight: 700; 
@@ -134,31 +98,16 @@
         .question-review { font-weight: bold; margin-bottom: 8px; }
         .answer-review { margin-top: 8px; }
 
-        /* --- Media Query para Dispositivos Móviles --- */
         @media (max-width: 768px) {
-            body {
-                padding: 10px;
-            }
-            .container {
-                padding: 20px;
-            }
-            .header h1 {
-                font-size: 1.5em;
-            }
-            #question-text {
-                font-size: 1.2em;
-            }
-            .option {
-                padding: 12px;
-                font-size: 0.95em;
-            }
-            #start-btn, #restart-btn {
-                padding: 12px 25px;
-                font-size: 1.1em;
-            }
-            #score-text {
-                font-size: 2em;
-            }
+            body { padding: 10px; }
+            .container { padding: 15px; }
+            .header h1 { font-size: 1.5em; }
+            .header p { font-size: 0.9em; }
+            #question-text { font-size: 1.1em; }
+            .option { padding: 12px; font-size: 0.9em; }
+            #start-btn, #restart-btn { padding: 12px 25px; font-size: 1em; }
+            #score-text { font-size: 2em; }
+            .quiz-header { flex-direction: column; gap: 10px; }
         }
     </style>
 </head>
@@ -171,14 +120,17 @@
         <div id="start-screen">
             <h2>¡Listo para tu Examen Simulado!</h2>
             <p>
-                Te enfrentarás a 40 preguntas conceptuales y situacionales de un banco de más de 90, cubriendo todos los temas del curso. 
-                <br><b>El sistema evita repetir preguntas que ya has visto.</b>
+                Te enfrentarás a 40 preguntas aleatorias de un banco de más de 90. Tendrás <b>45 minutos</b> para completar el examen.
+                <br><b>El sistema evita repetir preguntas que ya has visto en sesiones anteriores.</b>
                 <br>¡Mucha suerte!
             </p>
             <button id="start-btn">Comenzar Examen</button>
         </div>
         <div id="quiz-container">
-            <div id="question-counter"></div>
+            <div class="quiz-header">
+                <div id="question-counter"></div>
+                <div id="timer"></div>
+            </div>
             <div id="question-text"></div>
             <div id="answer-options"></div>
         </div>
@@ -398,14 +350,17 @@ const resultsContainer = document.getElementById('results-container');
 const startBtn = document.getElementById('start-btn');
 const restartBtn = document.getElementById('restart-btn');
 const questionCounterElem = document.getElementById('question-counter');
+const timerElem = document.getElementById('timer');
 const questionTextElem = document.getElementById('question-text');
 const answerOptionsElem = document.getElementById('answer-options');
 const scoreTextElem = document.getElementById('score-text');
 const scoreMessageElem = document.getElementById('score-message');
 const reviewListElem = document.getElementById('review-list');
+
 let shuffledQuestions, currentQuestionIndex, score, userAnswers;
 const EXAM_LENGTH = 40;
-const USED_QUESTIONS_KEY = 'usedDrivingTestQuestions';
+const TIME_LIMIT = 45 * 60; // 45 minutos en segundos
+let timerInterval;
 
 function shuffleArray(array) {
     for (let i = array.length - 1; i > 0; i--) {
@@ -414,49 +369,39 @@ function shuffleArray(array) {
     }
 }
 
-function getUsedQuestions() {
-    try {
-        const used = sessionStorage.getItem(USED_QUESTIONS_KEY);
-        return used ? JSON.parse(used) : [];
-    } catch (e) {
-        console.error("Error al leer de sessionStorage:", e);
-        return [];
-    }
-}
-
-function setUsedQuestions(questions) {
-    try {
-        const used = getUsedQuestions();
-        const newUsed = [...used, ...questions.map(q => q.question)];
-        sessionStorage.setItem(USED_QUESTIONS_KEY, JSON.stringify(newUsed));
-    } catch (e) {
-        console.error("Error al escribir en sessionStorage:", e);
-    }
-}
-
 function startQuiz() {
     startScreen.style.display = 'none';
     resultsContainer.style.display = 'none';
     quizContainer.style.display = 'block';
 
-    const usedQuestions = getUsedQuestions();
-    let availableQuestions = allQuestions.filter(q => !usedQuestions.includes(q.question));
-
-    if (availableQuestions.length < EXAM_LENGTH) {
-        console.log("Se han agotado las preguntas únicas. Reiniciando el banco de preguntas.");
-        sessionStorage.removeItem(USED_QUESTIONS_KEY);
-        availableQuestions = allQuestions;
-    }
-
-    shuffleArray(availableQuestions);
-    shuffledQuestions = availableQuestions.slice(0, EXAM_LENGTH);
-    setUsedQuestions(shuffledQuestions);
+    shuffledQuestions = [...allQuestions]; // Usamos copia para no alterar el original
+    shuffleArray(shuffledQuestions);
+    shuffledQuestions = shuffledQuestions.slice(0, EXAM_LENGTH);
     
     currentQuestionIndex = 0;
     score = 0;
     userAnswers = [];
-
+    
+    startTimer();
     showQuestion();
+}
+
+function startTimer() {
+    let timeLeft = TIME_LIMIT;
+    clearInterval(timerInterval); // Limpiar cualquier temporizador anterior
+
+    timerInterval = setInterval(() => {
+        timeLeft--;
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        timerElem.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+        if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            alert("¡Se acabó el tiempo!");
+            showResults();
+        }
+    }, 1000);
 }
 
 function showQuestion() {
@@ -469,18 +414,22 @@ function showQuestion() {
         const optionElement = document.createElement('div');
         optionElement.classList.add('option');
         optionElement.textContent = optionText;
-        optionElement.addEventListener('click', () => selectAnswer(optionText, optionElement));
+        optionElement.addEventListener('click', (e) => selectAnswer(e, optionText));
         answerOptionsElem.appendChild(optionElement);
     });
 }
 
 function resetState() {
     answerOptionsElem.innerHTML = '';
+    // Desenfocar cualquier elemento activo para evitar el "auto-hover" en móviles
+    if (document.activeElement) document.activeElement.blur();
 }
 
-function selectAnswer(selectedOptionText, selectedOptionElement) {
+function selectAnswer(event, selectedOptionText) {
+    // Evitar doble clic
     if (document.querySelector('.option.selected')) return;
     
+    const selectedOptionElement = event.currentTarget;
     selectedOptionElement.classList.add('selected');
 
     const currentQuestion = shuffledQuestions[currentQuestionIndex];
@@ -500,9 +449,10 @@ function selectAnswer(selectedOptionText, selectedOptionElement) {
         if (currentQuestionIndex < EXAM_LENGTH) {
             showQuestion();
         } else {
+            clearInterval(timerInterval); // Detener el tiempo al terminar
             showResults();
         }
-    }, 500);
+    }, 400);
 }
 
 function showResults() {
