@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador Profesional V3.1 - Examen de Conducir Argentina</title>
+    <title>Simulador Profesional V4 - Examen de Conducir Argentina</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
         
@@ -127,22 +127,6 @@
         #review-list li.incorrect { border-color: var(--danger-color); }
         .question-review { font-weight: bold; margin-bottom: 8px; }
         .answer-review { margin-top: 8px; font-size: 0.95em; }
-        
-        .icon-btn {
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 8px;
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            opacity: 0.6;
-            transition: opacity 0.3s;
-            z-index: 10;
-        }
-        .icon-btn:hover { opacity: 1; }
-        .icon-btn svg { width: 24px; height: 24px; stroke: #555; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
-        #close-btn { display: none; }
 
         @media (max-width: 768px) {
             body { padding: 10px; }
@@ -153,29 +137,20 @@
             .btn { padding: 15px 30px; font-size: 1em; }
             #score-text { font-size: 2em; }
             .quiz-info { font-size: 0.9em; }
-            .icon-btn { top: 15px; right: 15px; }
         }
     </style>
 </head>
 <body>
     <div class="main-container">
         
-        <button id="close-btn" class="icon-btn" title="Cerrar Examen">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
-                <path d="M18 6L6 18"></path>
-                <path d="M6 6L18 18"></path>
-            </svg>
-        </button>
-
         <div id="start-screen" class="screen active">
             <div class="header">
-                <h1>Simulador de Examen de Conducir</h1>
+                <h1>Simulador de Examen de Conducir B1/B2</h1>
                 <p>Edición Profesional 2025 - Argentina</p>
             </div>
             <p>
-                Te enfrentarás a 40 preguntas aleatorias de un banco de más de 90. Tendrás <b>45 minutos</b> para completar la prueba.
-                <br><b>El sistema evita repetir preguntas que ya has visto en sesiones anteriores.</b>
-                <br>¡Mucha suerte!
+                Te enfrentarás a 40 preguntas aleatorias de un banco de más de 120, cubriendo todos los temas del curso oficial.
+                <br>Tienes <b>45 minutos</b> para completar la prueba.
             </p>
             <button id="start-btn" class="btn">Comenzar Examen</button>
         </div>
@@ -217,53 +192,113 @@
 
 <script>
     const allQuestions = [
-        { question: "El concepto de 'conducción a la defensiva' se refiere a:", options: ["Conducir agresivamente para imponerse", "Anticiparse a los posibles errores de los demás y a las condiciones del entorno", "Ceder siempre el paso, incluso cuando se tiene prioridad", "Utilizar el vehículo solo para lo estrictamente necesario"], correctAnswer: "Anticiparse a los posibles errores de los demás y a las condiciones del entorno" },
-        { question: "En el trato con otros usuarios de la vía, el conductor debe ser:", options: ["Competitivo y rápido", "Indiferente, concentrándose solo en su propio manejo", "Cortés, solidario y respetuoso", "Rápido para no entorpecer el tránsito"], correctAnswer: "Cortés, solidario y respetuoso" },
-        { question: "El campo visual de un conductor se reduce a medida que:", options: ["Disminuye la velocidad", "Aumenta la velocidad", "Se hace de día", "El vehículo tiene más espejos"], correctAnswer: "Aumenta la velocidad" },
-        { question: "¿Cuál es el objetivo principal de la Licencia Nacional de Conducir (LNC)?", options: ["Aumentar la recaudación fiscal", "Unificar criterios y requisitos para la habilitación de conductores en todo el país", "Limitar la cantidad de vehículos en circulación", "Facilitar la compra y venta de automotores"], correctAnswer: "Unificar criterios y requisitos para la habilitación de conductores en todo el país" },
-        { question: "Para obtener la licencia de conducir por primera vez, ¿es obligatorio realizar el Curso Nacional de Educación Vial?", options: ["No, es opcional", "Sí, es de carácter obligatorio y gratuito", "Solo es obligatorio para menores de 21 años", "Solo para licencias profesionales"], correctAnswer: "Sí, es de carácter obligatorio y gratuito" },
-        { question: "Los frenos ABS son un elemento de la seguridad:", options: ["Activa, porque ayudan a evitar un siniestro", "Pasiva, porque actúan después del impacto", "Preventiva, porque alertan al conductor", "Estructural, porque forman parte del chasis"], correctAnswer: "Activa, porque ayudan a evitar un siniestro" },
-        { question: "El apoya cabezas, ¿contra qué tipo de lesión protege principalmente?", options: ["Lesiones en las piernas por el tablero", "Golpes en el cráneo contra el parabrisas", "El 'efecto latigazo' en las cervicales durante una colisión trasera", "Deslizamiento del cuerpo por debajo del cinturón"], correctAnswer: "El 'efecto latigazo' en las cervicales durante una colisión trasera" },
-        { question: "Para una conducción eficiente y un menor consumo de combustible, se recomienda:", options: ["Realizar aceleraciones y frenadas bruscas constantemente", "Mantener una velocidad uniforme y evitar cambios de marcha innecesarios", "Circular siempre en la marcha más baja posible para tener más potencia", "Llevar los neumáticos con una presión inferior a la recomendada"], correctAnswer: "Mantener una velocidad uniforme y evitar cambios de marcha innecesarios" },
-        { question: "En una encrucijada urbana sin señalizar, si dos vehículos llegan al mismo tiempo, la prioridad de paso la tiene:", options: ["El vehículo que viene por la derecha del otro", "El que viene por la izquierda", "El que circula por la calle más ancha", "El que tiene intención de girar"], correctAnswer: "El vehículo que viene por la derecha del otro" },
-        { question: "Usted se aproxima a una rotonda. ¿Quién tiene prioridad de paso?", options: ["Usted, porque va a ingresar", "El vehículo que ya se encuentra circulando dentro de la rotonda", "El vehículo que viene por su derecha, aunque aún no haya ingresado a la rotonda", "El vehículo más rápido"], correctAnswer: "El vehículo que ya se encuentra circulando dentro de la rotonda" },
-        { question: "La prioridad absoluta del vehículo que circula por la derecha se pierde ante:", options: ["La señalización específica en contrario (PARE, CEDA EL PASO)", "Vehículos ferroviarios y de emergencia", "Peatones que cruzan por senda peatonal", "Todas las anteriores son correctas"], correctAnswer: "Todas las anteriores son correctas" },
-        { question: "En un paso a nivel sin barreras ni señalización, la prioridad de paso es siempre de:", options: ["El vehículo que llega primero", "El tren", "El vehículo particular, por ser más ágil", "El que viene por la derecha"], correctAnswer: "El tren" },
-        { question: "Usted está saliendo de un garaje y un peatón camina por la vereda. ¿Quién tiene prioridad?", options: ["Usted, porque el peatón debe detenerse", "El peatón, siempre tiene prioridad en la acera", "Ambos deben ceder el paso mutuamente", "Usted, si toca bocina para advertir"], correctAnswer: "El peatón, siempre tiene prioridad en la acera" },
-        { question: "Si usted circula por una ruta pavimentada y otro vehículo intenta ingresar desde un camino de tierra, la prioridad es de:", options: ["El vehículo que viene por el camino de tierra", "El vehículo que ya circula por la ruta pavimentada", "El que viene por la derecha, sin importar el tipo de vía", "Se debe definir por señas"], correctAnswer: "El vehículo que ya circula por la ruta pavimentada" },
-        { question: "En una pendiente, si el paso simultáneo de dos vehículos es imposible, la prioridad la tiene:", options: ["El vehículo que desciende (baja)", "El vehículo que asciende (sube)", "El vehículo más pesado", "El vehículo más liviano"], correctAnswer: "El vehículo que asciende (sube)" },
-        { question: "Al realizar un adelantamiento en una ruta de doble mano, la prioridad la tiene:", options: ["Usted, que está adelantando", "El vehículo que circula en sentido contrario por el carril que usted está utilizando", "El vehículo que va a ser adelantado", "El más rápido de los tres"], correctAnswer: "El vehículo que circula en sentido contrario por el carril que usted está utilizando" },
-        { question: "¿Cuál es la velocidad máxima permitida en una calle de zona urbana si no hay señalización que indique otra cosa?", options: ["30 km/h", "40 km/h", "50 km/h", "60 km/h"], correctAnswer: "40 km/h" },
-        { question: "¿Cuál es la velocidad máxima permitida en una avenida si no hay señalización que indique otra cosa?", options: ["40 km/h", "50 km/h", "60 km/h", "70 km/h"], correctAnswer: "60 km/h" },
-        { question: "Una señal de forma octogonal, de fondo rojo y letras blancas con la inscripción 'PARE', ¿a qué categoría pertenece?", options: ["Preventiva", "Informativa", "Reglamentaria (o Prescriptiva)", "Transitoria"], correctAnswer: "Reglamentaria (o Prescriptiva)" },
-        { question: "Las señales de forma romboidal con fondo amarillo y símbolos negros, ¿qué función cumplen?", options: ["Informar sobre destinos y servicios", "Prohibir o restringir maniobras", "Advertir sobre peligros o riesgos en la vía", "Señalizar desvíos por obras"], correctAnswer: "Advertir sobre peligros o riesgos en la vía" },
-        { question: "Usted se encuentra con una señal circular con borde rojo, fondo blanco y el pictograma de una bicicleta tachado. ¿Qué significa?", options: ["Circulación exclusiva de bicicletas", "Prohibición de circulación de bicicletas", "Senda para ciclistas", "Estacionamiento para bicicletas"], correctAnswer: "Prohibición de circulación de bicicletas" },
-        { question: "Una señal rectangular de fondo azul con un pictograma de un teléfono, ¿qué tipo de señal es?", options: ["Reglamentaria", "Preventiva", "Informativa de servicio", "Transitoria"], correctAnswer: "Informativa de servicio" },
-        { question: "Una señal en forma de rombo de color naranja con el pictograma de un obrero trabajando, indica:", options: ["Una advertencia permanente de zona de trabajo", "Una zona de obras o trabajos temporales en la calzada", "Un cruce de peatones especial", "Fin de la zona de obras"], correctAnswer: "Una zona de obras o trabajos temporales en la calzada" },
-        { question: "La demarcación horizontal de una doble línea amarilla continua en la calzada indica que:", options: ["Se puede adelantar desde ambos carriles con precaución", "Está prohibido adelantar o cambiar de carril en ambos sentidos", "Solo puede adelantar el que circula por la derecha", "Es una zona de estacionamiento medido"], correctAnswer: "Está prohibido adelantar o cambiar de carril en ambos sentidos" },
-        { question: "Una línea de detención blanca y transversal a la calzada, ¿qué indica?", options: ["El lugar donde se debe iniciar el sobrepaso", "El lugar exacto donde deben detenerse los vehículos ante un semáforo o señal de PARE", "El comienzo de una senda peatonal", "El ancho máximo del vehículo permitido"], correctAnswer: "El lugar exacto donde deben detenerse los vehículos ante un semáforo o señal de PARE" },
-        { question: "La luz amarilla intermitente de un semáforo le indica que debe:", options: ["Detenerse como si fuera un PARE", "Avanzar con precaución", "Esperar la luz verde, porque el semáforo está por cambiar", "Acelerar para despejar el cruce"], correctAnswer: "Avanzar con precaución" },
-        { question: "Usted ve una señal triangular invertida, con borde rojo y fondo blanco. ¿Qué acción debe realizar?", options: ["Detenerse completamente", "Ceder el paso a los vehículos de la vía transversal", "Continuar con la misma velocidad", "Tocar bocina y avanzar"], correctAnswer: "Ceder el paso a los vehículos de la vía transversal" },
-        { question: "El límite de alcoholemia para un conductor de vehículo particular en Argentina es de:", options: ["0.0 gramos por litro de sangre", "0.2 gramos por litro de sangre", "0.5 gramos por litro de sangre", "0.8 gramos por litro de sangre"], correctAnswer: "0.5 gramos por litro de sangre" },
-        { question: "Conducir con fatiga o sueño es peligroso principalmente porque:", options: ["Aumenta el consumo de combustible", "Disminuye el tiempo de reacción y la capacidad de atención", "Puede dañar la suspensión del vehículo", "Genera multas aunque no se cometa otra infracción"], correctAnswer: "Disminuye el tiempo de reacción y la capacidad de atención" },
-        { question: "El uso del teléfono celular (incluso con manos libres) mientras se conduce:", options: ["Está permitido si es una llamada corta", "Está prohibido porque disminuye la atención necesaria para el manejo", "Está permitido solo en avenidas", "Solo está prohibido para enviar mensajes"], correctAnswer: "Está prohibido porque disminuye la atención necesaria para el manejo" },
-        { question: "Si usted participa en un siniestro vial, ¿está obligado a detenerse y suministrar sus datos?", options: ["No, si el daño es menor", "Solo si hay heridos", "Sí, siempre es una obligación legal", "Solo si la otra parte lo solicita expresamente"], correctAnswer: "Sí, siempre es una obligación legal" },
-        { question: "La sanción de 'inhabilitación' consiste en:", options: ["El pago de una multa económica", "La obligación de realizar un curso de reeducación", "La pérdida temporal o definitiva del derecho a conducir", "El secuestro del vehículo"], correctAnswer: "La pérdida temporal o definitiva del derecho a conducir" },
-        { question: "Negarse a realizar un control de alcoholemia:", options: ["No tiene consecuencias si no se cometió otra infracción", "Es considerado una falta leve", "Constituye una falta grave y genera una presunción de alcoholemia positiva en su contra", "Solo se penaliza si el conductor muestra signos evidentes de ebriedad"], correctAnswer: "Constituye una falta grave y genera una presunción de alcoholemia positiva en su contra" },
-        { question: "¿Cuál es la finalidad de la banda de rodamiento de un neumático?", options: ["Mejorar la estética del vehículo", "Reducir el ruido de la marcha", "Proporcionar adherencia al pavimento y evacuar agua", "Aumentar la velocidad máxima del vehículo"], correctAnswer: "Proporcionar adherencia al pavimento y evacuar agua" },
-        { question: "Un conductor principiante debe llevar un cartel visible con la letra 'P' durante los primeros:", options: ["3 meses", "6 meses", "12 meses", "24 meses"], correctAnswer: "6 meses" },
-        { question: "La documentación obligatoria para circular incluye la Licencia, la Cédula de Identificación del Vehículo y:", options: ["El título de propiedad del vehículo", "El DNI del conductor", "El comprobante de pago de la última patente", "El comprobante de seguro obligatorio vigente"], correctAnswer: "El comprobante de seguro obligatorio vigente" },
-        { question: "Si su vehículo queda inmovilizado en un túnel por una avería, ¿qué debe hacer?", options: ["Apagar todas las luces y esperar ayuda dentro del auto", "Intentar repararlo en el lugar sin importar el tráfico", "Encender las balizas, apagar el motor y, si es posible, empujar el vehículo al exterior o a una zona de seguridad", "Abandonar el vehículo y caminar por el centro del túnel para ser visto"], correctAnswer: "Encender las balizas, apagar el motor y, si es posible, empujar el vehículo al exterior o a una zona de seguridad" },
-        { question: "Una señal preventiva con el pictograma de una curva cerrada advierte sobre:", options: ["Una curva común", "Una curva de 90 grados o más cerrada de lo normal", "El inicio de un camino sinuoso", "Una rotonda"], correctAnswer: "Una curva de 90 grados o más cerrada de lo normal" },
-        { question: "Una señal informativa con un pictograma de un avión indica la proximidad de un:", options: ["Mirador", "Corredor aéreo de bajo vuelo", "Aeropuerto o aeródromo", "Museo de aviación"], correctAnswer: "Aeropuerto o aeródromo" },
-        { question: "En un camino de montaña con pendiente, si el vehículo que asciende lleva un acoplado, ¿mantiene su prioridad sobre el que desciende?", options: ["No, pierde la prioridad por llevar acoplado", "Sí, el que asciende siempre tiene prioridad, con o sin acoplado", "Solo si el que desciende no lleva acoplado", "Deben decidir por señas"], correctAnswer: "Sí, el que asciende siempre tiene prioridad, con o sin acoplado" },
-        { question: "Al circular de noche, ¿cuándo es obligatorio cambiar de luces altas a bajas?", options: ["Al entrar en una zona urbana", "Al cruzarse con otro vehículo o al circular detrás de uno", "A y B son correctas", "Nunca, siempre se deben usar las altas para ver mejor"], correctAnswer: "A y B son correctas" },
-        { question: "El color amarillo en el cordón de la vereda indica:", options: ["Prohibido estacionar y detenerse", "Prohibido estacionar, pero se permite la detención para ascenso y descenso", "Estacionamiento exclusivo para taxis", "Zona de carga y descarga"], correctAnswer: "Prohibido estacionar, pero se permite la detención para ascenso y descenso" },
-        { question: "Una señal circular con una flecha blanca diagonal, dentro de un fondo azul, indica:", options: ["Prohibido circular en diagonal", "Sentido obligatorio en diagonal", "Mantenerse en el carril", "Circulación obligatoria por el carril indicado"], correctAnswer: "Circulación obligatoria por el carril indicado" },
-        { question: "La 'imprudencia' como factor de riesgo se define como:", options: ["No saber cómo reaccionar", "Actuar de forma peligrosa o temeraria, asumiendo riesgos innecesarios", "Distraerse con el celular", "No realizar el mantenimiento del vehículo"], correctAnswer: "Actuar de forma peligrosa o temeraria, asumiendo riesgos innecesarios" },
-        { question: "La 'impericia' se refiere a:", options: ["La falta de habilidad o experiencia para ejecutar una maniobra", "Conducir de manera agresiva", "No respetar las señales de tránsito", "Exceder los límites de velocidad"], correctAnswer: "La falta de habilidad o experiencia para ejecutar una maniobra" },
-        { question: "Una señal circular con borde rojo que muestra el pictograma de una bocina tachada significa:", options: ["Prohibido usar la radio a alto volumen", "Zona de silencio hospitalario", "Prohibido el uso de la bocina o señales acústicas", "Fin de la prohibición de ruidos"], correctAnswer: "Prohibido el uso de la bocina o señales acústicas" },
-        { question: "Un matafuegos de 1kg (tipo ABC), ¿es adecuado para un automóvil particular?", options: ["No, se necesita uno de 5kg para ser efectivo", "Sí, es el tipo y tamaño reglamentario para automóviles", "Solo si el auto es a gasoil, los nafteros no lo necesitan", "No, el matafuegos es opcional en autos particulares"], correctAnswer: "Sí, es el tipo y tamaño reglamentario para automóviles" }
+        // Módulo 1 y 5: Ética, Ciudadanía y Principios Generales
+        { id: 1, question: "El concepto de 'conducción a la defensiva' se refiere a:", options: ["Conducir agresivamente para imponerse", "Anticiparse a los posibles errores de los demás y a las condiciones del entorno", "Ceder siempre el paso, incluso cuando se tiene prioridad", "Utilizar el vehículo solo para lo estrictamente necesario"], correctAnswer: "Anticiparse a los posibles errores de los demás y a las condiciones del entorno" },
+        { id: 2, question: "En el trato con otros usuarios de la vía, el conductor debe ser:", options: ["Competitivo y rápido", "Indiferente, concentrándose solo en su propio manejo", "Cortés, solidario y respetuoso", "Rápido para no entorpecer el tránsito"], correctAnswer: "Cortés, solidario y respetuoso" },
+        { id: 3, question: "El campo visual de un conductor se reduce a medida que:", options: ["Disminuye la velocidad", "Aumenta la velocidad", "Se hace de día", "El vehículo tiene más espejos"], correctAnswer: "Aumenta la velocidad" },
+        { id: 4, question: "La 'trilogía vial' está compuesta por los factores:", options: ["Humano, Vehicular y Ambiental", "Conductor, Peatón y Ciclista", "Velocidad, Distancia y Tiempo", "Ley, Señales y Sentido Común"], correctAnswer: "Humano, Vehicular y Ambiental" },
+        { id: 5, question: "¿Qué es un 'peatón' según la definición del material de estudio?", options: ["Toda persona que camina por la calle", "Toda persona que se desplaza por la vía pública usando sus propios miembros", "Solo quienes cruzan por la senda peatonal", "Quienes esperan el transporte público"], correctAnswer: "Toda persona que se desplaza por la vía pública usando sus propios miembros" },
+        
+        // Módulo 2: Licencia Nacional de Conducir
+        { id: 6, question: "¿Cuál es el objetivo principal de la Licencia Nacional de Conducir (LNC)?", options: ["Aumentar la recaudación fiscal", "Unificar criterios y requisitos para la habilitación de conductores en todo el país", "Limitar la cantidad de vehículos en circulación", "Facilitar la compra y venta de automotores"], correctAnswer: "Unificar criterios y requisitos para la habilitación de conductores en todo el país" },
+        { id: 7, question: "Para obtener la licencia de conducir por primera vez, ¿es obligatorio realizar el Curso Nacional de Educación Vial?", options: ["No, es opcional", "Sí, es de carácter obligatorio y gratuito", "Solo es obligatorio para menores de 21 años", "Solo para licencias profesionales"], correctAnswer: "Sí, es de carácter obligatorio y gratuito" },
+        { id: 8, question: "La categoría B1 permite conducir automóviles y camionetas hasta un peso máximo de:", options: ["2.500 kg.", "3.500 kg.", "4.000 kg.", "No tiene límite de peso"], correctAnswer: "3.500 kg." },
+        { id: 9, question: "Si su licencia de conducir presenta datos que difieren de su DNI actual, ¿cuánto tiempo tiene de validez?", options: ["Es válida hasta su vencimiento", "Caduca inmediatamente", "Caduca a los 90 días del cambio de datos", "Caduca a los 30 días del cambio de datos"], correctAnswer: "Caduca a los 90 días del cambio de datos" },
+        { id: 10, question: "La edad mínima para obtener la licencia categoría B1 en Argentina es de:", options: ["16 años", "17 años", "18 años", "21 años"], correctAnswer: "17 años" },
+
+        // Módulo 3: El Vehículo y Seguridad
+        { id: 11, question: "Los frenos ABS son un elemento de la seguridad:", options: ["Activa, porque ayudan a evitar un siniestro", "Pasiva, porque actúan después del impacto", "Preventiva, porque alertan al conductor", "Estructural, porque forman parte del chasis"], correctAnswer: "Activa, porque ayudan a evitar un siniestro" },
+        { id: 12, question: "El apoya cabezas, ¿contra qué tipo de lesión protege principalmente?", options: ["Lesiones en las piernas por el tablero", "Golpes en el cráneo contra el parabrisas", "El 'efecto latigazo' en las cervicales durante una colisión trasera", "Deslizamiento del cuerpo por debajo del cinturón"], correctAnswer: "El 'efecto latigazo' en las cervicales durante una colisión trasera" },
+        { id: 13, question: "La 'Seguridad Activa' de un vehículo se refiere a los sistemas que:", options: ["Minimizan los daños en caso de accidente", "Ayudan a evitar que el accidente ocurra", "Hacen el viaje más confortable", "Mejoran el rendimiento del motor"], correctAnswer: "Ayudan a evitar que el accidente ocurra" },
+        { id: 14, question: "Indique cuál de los siguientes es un elemento de la 'Seguridad Pasiva':", options: ["Sistema de frenos ABS", "Control de estabilidad (ESP)", "Cinturón de seguridad", "Dirección asistida"], correctAnswer: "Cinturón de seguridad" },
+        { id: 15, question: "Para que el cinturón de seguridad sea efectivo, la banda abdominal debe pasar sobre:", options: ["El abdomen (partes blandas)", "Los huesos de la cadera (pelvis)", "El estómago", "Lo más arriba posible"], correctAnswer: "Los huesos de la cadera (pelvis)" },
+        { id: 16, question: "La Revisión Técnica Obligatoria (RTO) para un vehículo particular con más de 7 años de antigüedad tiene una vigencia de:", options: ["24 meses", "18 meses", "12 meses", "6 meses"], correctAnswer: "12 meses" },
+        { id: 17, question: "El fenómeno de 'Aquaplaning' o 'Hidroplaneamiento' ocurre cuando:", options: ["El vehículo se sobrecalienta por falta de agua", "Los neumáticos pierden adherencia por una capa de agua en la calzada", "Los frenos se mojan y no funcionan", "El motor se apaga al pasar por un charco"], correctAnswer: "Los neumáticos pierden adherencia por una capa de agua en la calzada" },
+
+        // Módulo 4: Conducción Eficiente
+        { id: 18, question: "Para una conducción eficiente y un menor consumo de combustible, se recomienda:", options: ["Realizar aceleraciones y frenadas bruscas constantemente", "Mantener una velocidad uniforme y evitar cambios de marcha innecesarios", "Circular siempre en la marcha más baja posible para tener más potencia", "Llevar los neumáticos con una presión inferior a la recomendada"], correctAnswer: "Mantener una velocidad uniforme y evitar cambios de marcha innecesarios" },
+        { id: 19, question: "El uso del aire acondicionado, ¿influye en el consumo de combustible?", options: ["No, no tiene ninguna relación", "Sí, lo aumenta", "Sí, lo disminuye", "Solo influye si se usa en la ruta"], correctAnswer: "Sí, lo aumenta" },
+
+        // Módulo 5 y 6: Prioridades de Paso y Velocidades
+        { id: 20, question: "En una encrucijada urbana sin señalizar, si dos vehículos llegan al mismo tiempo, la prioridad de paso la tiene:", options: ["El vehículo que viene por la derecha del otro", "El que viene por la izquierda", "El que circula por la calle más ancha", "El que tiene intención de girar"], correctAnswer: "El vehículo que viene por la derecha del otro" },
+        { id: 21, question: "Usted se aproxima a una rotonda. ¿Quién tiene prioridad de paso?", options: ["Usted, porque va a ingresar", "El vehículo que ya se encuentra circulando dentro de la rotonda", "El vehículo que viene por su derecha, aunque aún no haya ingresado a la rotonda", "El vehículo más rápido"], correctAnswer: "El vehículo que ya se encuentra circulando dentro de la rotonda" },
+        { id: 22, question: "La prioridad absoluta del vehículo que circula por la derecha se pierde ante:", options: ["La señalización específica en contrario (PARE, CEDA EL PASO)", "Vehículos ferroviarios y de emergencia", "Peatones que cruzan por senda peatonal", "Todas las anteriores son correctas"], correctAnswer: "Todas las anteriores son correctas" },
+        { id: 23, question: "En un paso a nivel sin barreras ni señalización, la prioridad de paso es siempre de:", options: ["El vehículo que llega primero", "El tren", "El vehículo particular, por ser más ágil", "El que viene por la derecha"], correctAnswer: "El tren" },
+        { id: 24, question: "Usted está saliendo de un garaje y un peatón camina por la vereda. ¿Quién tiene prioridad?", options: ["Usted, porque el peatón debe detenerse", "El peatón, siempre tiene prioridad en la acera", "Ambos deben ceder el paso mutuamente", "Usted, si toca bocina para advertir"], correctAnswer: "El peatón, siempre tiene prioridad en la acera" },
+        { id: 25, question: "Si usted circula por una ruta pavimentada y otro vehículo intenta ingresar desde un camino de tierra, la prioridad es de:", options: ["El vehículo que viene por el camino de tierra", "El vehículo que ya circula por la ruta pavimentada", "El que viene por la derecha, sin importar el tipo de vía", "Se debe definir por señas"], correctAnswer: "El vehículo que ya circula por la ruta pavimentada" },
+        { id: 26, question: "En una pendiente, si el paso simultáneo de dos vehículos es imposible, la prioridad la tiene:", options: ["El vehículo que desciende (baja)", "El vehículo que asciende (sube)", "El vehículo más pesado", "El vehículo más liviano"], correctAnswer: "El vehículo que asciende (sube)" },
+        { id: 27, question: "Al realizar un adelantamiento en una ruta de doble mano, la prioridad la tiene:", options: ["Usted, que está adelantando", "El vehículo que circula en sentido contrario por el carril que usted está utilizando", "El vehículo que va a ser adelantado", "El más rápido de los tres"], correctAnswer: "El vehículo que circula en sentido contrario por el carril que usted está utilizando" },
+        { id: 28, question: "¿Cuál es la velocidad máxima permitida en una calle de zona urbana si no hay señalización que indique otra cosa?", options: ["30 km/h", "40 km/h", "50 km/h", "60 km/h"], correctAnswer: "40 km/h" },
+        { id: 29, question: "¿Cuál es la velocidad máxima permitida en una avenida si no hay señalización que indique otra cosa?", options: ["40 km/h", "50 km/h", "60 km/h", "70 km/h"], correctAnswer: "60 km/h" },
+        { id: 30, question: "En autopistas, la velocidad máxima para un automóvil particular es de:", options: ["100 km/h", "110 km/h", "120 km/h", "130 km/h"], correctAnswer: "130 km/h" },
+        { id: 31, question: "¿Cuál es la velocidad mínima en una autopista cuya máxima es 130 km/h?", options: ["50 km/h", "60 km/h", "65 km/h", "80 km/h"], correctAnswer: "65 km/h" },
+        { id: 32, question: "El adelantamiento a otro vehículo debe realizarse siempre por:", options: ["La derecha, si hay espacio", "La banquina", "La izquierda", "El carril que esté más despejado"], correctAnswer: "La izquierda" },
+
+        // Módulo 7: Señalización Vial (Preguntas Descriptivas y de Clasificación)
+        { id: 33, question: "Una señal de forma octogonal, de fondo rojo y letras blancas con la inscripción 'PARE', ¿a qué categoría pertenece?", options: ["Preventiva", "Informativa", "Reglamentaria (o Prescriptiva)", "Transitoria"], correctAnswer: "Reglamentaria (o Prescriptiva)" },
+        { id: 34, question: "Las señales de forma romboidal con fondo amarillo y símbolos negros, ¿qué función cumplen?", options: ["Informar sobre destinos y servicios", "Prohibir o restringir maniobras", "Advertir sobre peligros o riesgos en la vía", "Señalizar desvíos por obras"], correctAnswer: "Advertir sobre peligros o riesgos en la vía" },
+        { id: 35, question: "Usted se encuentra con una señal circular con borde rojo, fondo blanco y el pictograma de una bicicleta tachado. ¿Qué significa?", options: ["Circulación exclusiva de bicicletas", "Prohibición de circulación de bicicletas", "Senda para ciclistas", "Estacionamiento para bicicletas"], correctAnswer: "Prohibición de circulación de bicicletas" },
+        { id: 36, question: "Una señal rectangular de fondo azul con un pictograma de un teléfono, ¿qué tipo de señal es?", options: ["Reglamentaria", "Preventiva", "Informativa de servicio", "Transitoria"], correctAnswer: "Informativa de servicio" },
+        { id: 37, question: "Una señal en forma de rombo de color naranja con el pictograma de un obrero trabajando, indica:", options: ["Una advertencia permanente de zona de trabajo", "Una zona de obras o trabajos temporales en la calzada", "Un cruce de peatones especial", "Fin de la zona de obras"], correctAnswer: "Una zona de obras o trabajos temporales en la calzada" },
+        { id: 38, question: "La demarcación horizontal de una doble línea amarilla continua en la calzada indica que:", options: ["Se puede adelantar desde ambos carriles con precaución", "Está prohibido adelantar o cambiar de carril en ambos sentidos", "Solo puede adelantar el que circula por la derecha", "Es una zona de estacionamiento medido"], correctAnswer: "Está prohibido adelantar o cambiar de carril en ambos sentidos" },
+        { id: 39, question: "Una línea de detención blanca y transversal a la calzada, ¿qué indica?", options: ["El lugar donde se debe iniciar el sobrepaso", "El lugar exacto donde deben detenerse los vehículos ante un semáforo o señal de PARE", "El comienzo de una senda peatonal", "El ancho máximo del vehículo permitido"], correctAnswer: "El lugar exacto donde deben detenerse los vehículos ante un semáforo o señal de PARE" },
+        { id: 40, question: "La luz amarilla intermitente de un semáforo le indica que debe:", options: ["Detenerse como si fuera un PARE", "Avanzar con precaución", "Esperar la luz verde, porque el semáforo está por cambiar", "Acelerar para despejar el cruce"], correctAnswer: "Avanzar con precaución" },
+        { id: 41, question: "Usted ve una señal triangular invertida, con borde rojo y fondo blanco. ¿Qué acción debe realizar?", options: ["Detenerse completamente", "Ceder el paso a los vehículos de la vía transversal", "Continuar con la misma velocidad", "Tocar bocina y avanzar"], correctAnswer: "Ceder el paso a los vehículos de la vía transversal" },
+        { id: 42, question: "Una señal romboidal amarilla con el pictograma de un auto derrapando, advierte sobre:", options: ["Curva peligrosa", "Camino sinuoso", "Calzada resbaladiza", "Prohibido derrapar"], correctAnswer: "Calzada resbaladiza" },
+        { id: 43, question: "La luz roja intermitente en un cruce ferroviario significa:", options: ["Avanzar si no se ve el tren", "Detenerse, es equivalente a una barrera baja", "Precaución, el tren está lejos", "Falla en el sistema"], correctAnswer: "Detenerse, es equivalente a una barrera baja" },
+        { id: 44, question: "Una señal circular con borde rojo y el número '60' en su interior, ¿qué indica?", options: ["Ruta Nacional 60", "Velocidad mínima 60 km/h", "Velocidad máxima 60 km/h", "Velocidad recomendada 60 km/h"], correctAnswer: "Velocidad máxima 60 km/h" },
+        { id: 45, question: "Una señal circular azul con el número '35' en su interior, ¿qué indica?", options: ["Velocidad máxima 35 km/h", "Velocidad mínima 35 km/h", "Fin de velocidad máxima", "Ruta Provincial 35"], correctAnswer: "Velocidad mínima 35 km/h" },
+        { id: 46, question: "El giro en 'U' está:", options: ["Permitido en avenidas anchas", "Permitido si no hay señal que lo prohíba", "Totalmente prohibido por ley", "Permitido solo en zonas rurales"], correctAnswer: "Totalmente prohibido por ley" },
+        
+        // Módulo 8: Condiciones Psicofísicas
+        { id: 47, question: "El límite de alcoholemia para un conductor de vehículo particular en Argentina es de:", options: ["0.0 gramos por litro de sangre", "0.2 gramos por litro de sangre", "0.5 gramos por litro de sangre", "0.8 gramos por litro de sangre"], correctAnswer: "0.5 gramos por litro de sangre" },
+        { id: 48, question: "Conducir con fatiga o sueño es peligroso principalmente porque:", options: ["Aumenta el consumo de combustible", "Disminuye el tiempo de reacción y la capacidad de atención", "Puede dañar la suspensión del vehículo", "Genera multas aunque no se cometa otra infracción"], correctAnswer: "Disminuye el tiempo de reacción y la capacidad de atención" },
+        { id: 49, question: "El uso del teléfono celular (incluso con manos libres) mientras se conduce:", options: ["Está permitido si es una llamada corta", "Está prohibido porque disminuye la atención necesaria para el manejo", "Está permitido solo en avenidas", "Solo está prohibido para enviar mensajes"], correctAnswer: "Está prohibido porque disminuye la atención necesaria para el manejo" },
+        { id: 50, question: "¿Qué efecto puede tener un medicamento de venta libre, como un antihistamínico, en la conducción?", options: ["Ninguno, son seguros", "Pueden causar somnolencia y reducir los reflejos", "Mejoran la concentración", "Solo afectan si se mezclan con alcohol"], correctAnswer: "Pueden causar somnolencia y reducir los reflejos" },
+        
+        // Módulo 9 y 10: Responsabilidades y Sanciones
+        { id: 51, question: "Si usted participa en un siniestro vial, ¿está obligado a detenerse y suministrar sus datos?", options: ["No, si el daño es menor", "Solo si hay heridos", "Sí, siempre es una obligación legal", "Solo si la otra parte lo solicita expresamente"], correctAnswer: "Sí, siempre es una obligación legal" },
+        { id: 52, question: "La sanción de 'inhabilitación' consiste en:", options: ["El pago de una multa económica", "La obligación de realizar un curso de reeducación", "La pérdida temporal o definitiva del derecho a conducir", "El secuestro del vehículo"], correctAnswer: "La pérdida temporal o definitiva del derecho a conducir" },
+        { id: 53, question: "Negarse a realizar un control de alcoholemia:", options: ["No tiene consecuencias si no se cometió otra infracción", "Es considerado una falta leve", "Constituye una falta grave y genera una presunción de alcoholemia positiva en su contra", "Solo se penaliza si el conductor muestra signos evidentes de ebriedad"], correctAnswer: "Constituye una falta grave y genera una presunción de alcoholemia positiva en su contra" },
+        { id: 54, question: "La 'impericia' como factor humano en un siniestro se refiere a:", options: ["La falta de habilidad o experiencia para ejecutar una maniobra", "Conducir de manera agresiva", "No respetar las señales de tránsito intencionadamente", "Exceder los límites de velocidad"], correctAnswer: "La falta de habilidad o experiencia para ejecutar una maniobra" },
+        { id: 55, question: "La responsabilidad civil derivada de un accidente de tránsito implica:", options: ["Una posible pena de prisión", "La obligación de reparar económicamente los daños y perjuicios causados", "La inhabilitación para conducir", "La realización de trabajo comunitario"], correctAnswer: "La obligación de reparar económicamente los daños y perjuicios causados" },
+        
+        // Banco Adicional para mayor aleatoriedad
+        { id: 56, question: "¿Cuál es la finalidad de la banda de rodamiento de un neumático?", options: ["Mejorar la estética del vehículo", "Reducir el ruido de la marcha", "Proporcionar adherencia al pavimento y evacuar agua", "Aumentar la velocidad máxima del vehículo"], correctAnswer: "Proporcionar adherencia al pavimento y evacuar agua" },
+        { id: 57, question: "Un conductor principiante debe llevar un cartel visible con la letra 'P' durante los primeros:", options: ["3 meses", "6 meses", "12 meses", "24 meses"], correctAnswer: "6 meses" },
+        { id: 58, question: "La documentación obligatoria para circular incluye la Licencia, la Cédula de Identificación del Vehículo y:", options: ["El título de propiedad del vehículo", "El DNI del conductor", "El comprobante de pago de la última patente", "El comprobante de seguro obligatorio vigente"], correctAnswer: "El comprobante de seguro obligatorio vigente" },
+        { id: 59, question: "Si su vehículo queda inmovilizado en un túnel por una avería, ¿qué debe hacer?", options: ["Apagar todas las luces y esperar ayuda dentro del auto", "Intentar repararlo en el lugar sin importar el tráfico", "Encender las balizas, apagar el motor y, si es posible, empujar el vehículo al exterior o a una zona de seguridad", "Abandonar el vehículo y caminar por el centro del túnel para ser visto"], correctAnswer: "Encender las balizas, apagar el motor y, si es posible, empujar el vehículo al exterior o a una zona de seguridad" },
+        { id: 60, question: "Una señal preventiva con el pictograma de una curva cerrada advierte sobre:", options: ["Una curva común", "Una curva de 90 grados o más cerrada de lo normal", "El inicio de un camino sinuoso", "Una rotonda"], correctAnswer: "Una curva de 90 grados o más cerrada de lo normal" },
+        { id: 61, question: "Una señal informativa con un pictograma de un avión indica la proximidad de un:", options: ["Mirador", "Corredor aéreo de bajo vuelo", "Aeropuerto o aeródromo", "Museo de aviación"], correctAnswer: "Aeropuerto o aeródromo" },
+        { id: 62, question: "En un camino de montaña con pendiente, si el vehículo que asciende lleva un acoplado, ¿mantiene su prioridad sobre el que desciende?", options: ["No, pierde la prioridad por llevar acoplado", "Sí, el que asciende siempre tiene prioridad, con o sin acoplado", "Solo si el que desciende no lleva acoplado", "Deben decidir por señas"], correctAnswer: "Sí, el que asciende siempre tiene prioridad, con o sin acoplado" },
+        { id: 63, question: "Al circular de noche, ¿cuándo es obligatorio cambiar de luces altas a bajas?", options: ["Al entrar en una zona urbana", "Al cruzarse con otro vehículo o al circular detrás de uno", "A y B son correctas", "Nunca, siempre se deben usar las altas para ver mejor"], correctAnswer: "A y B son correctas" },
+        { id: 64, question: "El color amarillo en el cordón de la vereda indica:", options: ["Prohibido estacionar y detenerse", "Prohibido estacionar, pero se permite la detención para ascenso y descenso", "Estacionamiento exclusivo para taxis", "Zona de carga y descarga"], correctAnswer: "Prohibido estacionar, pero se permite la detención para ascenso y descenso" },
+        { id: 65, question: "Una señal circular con una flecha blanca diagonal, dentro de un fondo azul, indica:", options: ["Prohibido circular en diagonal", "Sentido obligatorio en diagonal", "Mantenerse en el carril", "Circulación obligatoria por el carril indicado"], correctAnswer: "Circulación obligatoria por el carril indicado" },
+        { id: 66, question: "La 'imprudencia' como factor de riesgo se define como:", options: ["No saber cómo reaccionar", "Actuar de forma peligrosa o temeraria, asumiendo riesgos innecesarios", "Distraerse con el celular", "No realizar el mantenimiento del vehículo"], correctAnswer: "Actuar de forma peligrosa o temeraria, asumiendo riesgos innecesarios" },
+        { id: 67, question: "Una señal circular con borde rojo que muestra el pictograma de una bocina tachada significa:", options: ["Prohibido usar la radio a alto volumen", "Zona de silencio hospitalario", "Prohibido el uso de la bocina o señales acústicas", "Fin de la prohibición de ruidos"], correctAnswer: "Prohibido el uso de la bocina o señales acústicas" },
+        { id: 68, question: "Un matafuegos de 1kg (tipo ABC), ¿es adecuado para un automóvil particular?", options: ["No, se necesita uno de 5kg para ser efectivo", "Sí, es el tipo y tamaño reglamentario para automóviles", "Solo si el auto es a gasoil, los nafteros no lo necesitan", "No, el matafuegos es opcional en autos particulares"], correctAnswer: "Sí, es el tipo y tamaño reglamentario para automóviles" },
+        { id: 69, question: "Usted llega a una esquina sin semáforo y debe girar a la izquierda. Un vehículo viene de frente en sentido contrario. ¿Debe cederle el paso?", options: ["No, porque yo llegué primero", "No, porque mi giro es prioritario", "Sí, debo ceder el paso al que circula de frente antes de realizar el giro", "Solo si el otro vehículo es más grande"], correctAnswer: "Sí, debo ceder el paso al que circula de frente antes de realizar el giro" },
+        { id: 70, question: "En un cruce de dos avenidas de igual jerarquía y sin señalizar, ¿quién tiene la prioridad?", options: ["El que circula por la avenida más transitada", "El que circula por la derecha", "El transporte público", "El que va a mayor velocidad"], correctAnswer: "El que circula por la derecha" },
+        { id: 71, question: "Una demarcación en el pavimento de líneas blancas en zigzag antes de una senda peatonal advierte sobre:", options: ["La prohibición de estacionar en esa zona", "La proximidad de una zona de alta peligrosidad que requiere reducir la velocidad", "El inicio de una zona de velocidad controlada por radar", "Un carril exclusivo para emergencias"], correctAnswer: "La proximidad de una zona de alta peligrosidad que requiere reducir la velocidad" },
+        { id: 72, question: "La velocidad mínima en una calle de zona urbana es:", options: ["No hay mínimo", "La mitad de la máxima (20 km/h)", "25 km/h", "10 km/h"], correctAnswer: "La mitad de la máxima (20 km/h)" },
+        { id: 73, question: "Si su vehículo no posee luces DRL (luces de circulación diurna), usted debe:", options: ["Circular con las luces de posición durante el día", "Circular con las luces bajas encendidas en todas las vías, durante todo el día", "No es necesario encender ninguna luz durante el día con buena visibilidad", "Circular con las balizas encendidas en ruta"], correctAnswer: "Circular con las luces bajas encendidas en todas las vías, durante todo el día" },
+        { id: 74, question: "Al estacionar su vehículo, la distancia entre el cordón y la rueda debe ser:", options: ["Menor a 50 cm", "Menor a 20 cm", "Exactamente 30 cm", "No importa la distancia"], correctAnswer: "Menor a 20 cm" },
+        { id: 75, question: "¿Está permitido circular con las balizas encendidas para advertir que se va a alta velocidad en ruta?", options: ["Sí, es una práctica recomendada", "No, su uso es solo para indicar detención por emergencia o en situaciones de peligro", "Solo de noche", "Sí, para que otros vehículos se aparten"], correctAnswer: "No, su uso es solo para indicar detención por emergencia o en situaciones de peligro" },
+        { id: 76, question: "¿Cuál es la distancia mínima lateral que se debe mantener al adelantar a un ciclista en zona urbana?", options: ["50 centímetros", "1 metro", "1.5 metros", "La distancia de un carril completo"], correctAnswer: "1.5 metros" },
+        { id: 77, question: "La demarcación de una línea de carril discontinua (blanca o amarilla) indica que:", options: ["El sobrepaso está prohibido", "El sobrepaso está permitido", "Se acerca a una zona peligrosa", "Es un carril exclusivo"], correctAnswer: "El sobrepaso está permitido" },
+        { id: 78, question: "La luz roja intermitente de un semáforo en un cruce de calles equivale a:", options: ["Una luz amarilla fija", "Una señal de CEDA EL PASO", "Una señal de PARE", "Un semáforo fuera de servicio"], correctAnswer: "Una señal de PARE" },
+        { id: 79, question: "Si al llegar a una bocacalle se encuentra con la señal de 'PARE', ¿dónde debe detenerse?", options: ["En cualquier lugar antes del cruce", "Sobre la senda peatonal", "Antes de la línea de detención o, si no la hay, sin invadir la senda peatonal", "Pasada la esquina para tener mejor visibilidad"], correctAnswer: "Antes de la línea de detención o, si no la hay, sin invadir la senda peatonal" },
+        { id: 80, question: "¿Qué significa 'vehículo detenido' según el apunte de Río Gallegos?", options: ["Un vehículo estacionado por más de 5 minutos", "El que se detiene por circunstancias del tránsito (semáforo, embotellamiento) sin que el conductor deje su puesto", "El que se detiene para que suban o bajen pasajeros, pero el conductor se baja del auto", "Cualquier vehículo que no esté en movimiento"], correctAnswer: "El que se detiene por circunstancias del tránsito (semáforo, embotellamiento) sin que el conductor deje su puesto" },
+        { id: 81, question: "¿Y qué significa 'vehículo estacionado'?", options: ["El que se detiene por menos de 5 minutos", "El que se detiene por circunstancias del tránsito", "El que permanece detenido por más tiempo del necesario para ascenso/descenso, o cuando el conductor está fuera de su puesto", "Un vehículo detenido con el motor apagado"], correctAnswer: "El que permanece detenido por más tiempo del necesario para ascenso/descenso, o cuando el conductor está fuera de su puesto" },
+        { id: 82, question: "En un cruce ferroviario, está prohibido detenerse sobre los rieles o a menos de:", options: ["1 metro de ellos", "2 metros de ellos", "5 metros de ellos", "10 metros de ellos"], correctAnswer: "5 metros de ellos" },
+        { id: 83, question: "Una línea de calzada continua (en el borde derecho de la ruta) de color blanco indica:", options: ["Que se puede circular sobre ella", "Que no debe ser traspasada", "El límite de la banquina", "Una zona de estacionamiento"], correctAnswer: "Que no debe ser traspasada" },
+        { id: 84, question: "La 'negligencia' como factor de riesgo se define como:", options: ["Actuar de forma arriesgada", "La falta del cuidado o la desatención en las obligaciones propias de la conducción", "No tener la habilidad para conducir", "No conocer las normas"], correctAnswer: "La falta del cuidado o la desatención en las obligaciones propias de la conducción" },
+        { id: 85, question: "Los niños menores de 10 años deben viajar:", options: ["En el asiento delantero con cinturón", "En el asiento trasero, con el Sistema de Retención Infantil correspondiente a su peso y edad", "En cualquier asiento, pero con un adulto al lado", "En el asiento trasero, solo con el cinturón del auto"], correctAnswer: "En el asiento trasero, con el Sistema de Retención Infantil correspondiente a su peso y edad" },
+        { id: 86, question: "Si un semáforo cambia de verde a amarillo, usted debe:", options: ["Acelerar para cruzar antes de que se ponga en rojo", "Detenerse, si es posible hacerlo con seguridad, antes de la línea de cruce", "Continuar la marcha normalmente", "Frenar bruscamente sin importar el vehículo de atrás"], correctAnswer: "Detenerse, si es posible hacerlo con seguridad, antes de la línea de cruce" },
+        { id: 87, question: "¿Está permitido estacionar un vehículo sobre la senda peatonal?", options: ["Sí, si es por menos de 5 minutos", "Solo para ascenso y descenso de pasajeros", "No, está prohibido", "Sí, si no se obstruye completamente"], correctAnswer: "No, está prohibido" },
+        { id: 88, question: "Una línea blanca continua en la calzada indica:", options: ["Que se puede cambiar de carril con precaución", "Que no se debe cruzar ni cambiar de carril", "El inicio de una zona de estacionamiento medido", "Un carril preferencial para bicicletas"], correctAnswer: "Que no se debe cruzar ni cambiar de carril" },
+        { id: 89, question: "La fatiga al conducir es peligrosa porque:", options: ["Aumenta el consumo de combustible", "Disminuye el tiempo de reacción y la capacidad de atención", "Desgasta los neumáticos más rápido", "Genera multas de tránsito"], correctAnswer: "Disminuye el tiempo de reacción y la capacidad de atención" },
+        { id: 90, question: "¿Qué elemento de seguridad es obligatorio llevar en el vehículo, además del matafuegos?", options: ["Un botiquín de primeros auxilios", "Un chaleco reflectante", "Ambas balizas portátiles normalizadas", "Una caja de herramientas completa"], correctAnswer: "Ambas balizas portátiles normalizadas" }
     ];
 
     // --- LÓGICA DEL SIMULADOR ---
@@ -272,8 +307,7 @@
     const resultsScreen = document.getElementById('results-screen');
     const startBtn = document.getElementById('start-btn');
     const restartBtn = document.getElementById('restart-btn');
-    const closeBtn = document.getElementById('close-btn');
-
+    
     const questionCounterElem = document.getElementById('question-counter');
     const timerElem = document.getElementById('timer');
     const progressBar = document.getElementById('progress-bar');
@@ -287,11 +321,15 @@
     const totalQuestionsElem = document.getElementById('total-questions');
     const reviewListElem = document.getElementById('review-list');
     
-    let shuffledQuestions, currentQuestionIndex, score, userAnswers;
+    let currentQuestions = [];
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let userAnswers = [];
+    let timerInterval;
     const EXAM_LENGTH = 40;
     const TIME_LIMIT = 45 * 60;
-    let timerInterval;
-    const USED_QUESTIONS_KEY = 'usedDrivingTestQuestions';
+    
+    let usedIndexes = new Set(JSON.parse(sessionStorage.getItem('usedIndexes')) || []);
 
     function shuffleArray(array) {
         for (let i = array.length - 1; i > 0; i--) {
@@ -305,34 +343,29 @@
         screen.classList.add('active');
     }
     
-    function getUsedQuestions() {
-        try {
-            const used = sessionStorage.getItem(USED_QUESTIONS_KEY);
-            return used ? JSON.parse(used) : [];
-        } catch (e) { return []; }
-    }
+    function getNewQuestions() {
+        let allPossibleIndexes = Array.from(allQuestions.keys());
+        let availableIndexes = allPossibleIndexes.filter(index => !usedIndexes.has(index));
 
-    function setUsedQuestions(questions) {
-        try {
-            const used = getUsedQuestions();
-            const newUsed = [...used, ...questions.map(q => q.question)];
-            sessionStorage.setItem(USED_QUESTIONS_KEY, JSON.stringify(newUsed));
-        } catch (e) {}
-    }
-
-    function startQuiz() {
-        switchScreen(quizScreen);
-        closeBtn.style.display = 'block';
-        
-        let availableQuestions = allQuestions.filter(q => !getUsedQuestions().includes(q.question));
-        if (availableQuestions.length < EXAM_LENGTH) {
-            sessionStorage.removeItem(USED_QUESTIONS_KEY);
-            availableQuestions = allQuestions;
+        if (availableIndexes.length < EXAM_LENGTH) {
+            console.log("Banco de preguntas únicas agotado. Reiniciando.");
+            usedIndexes.clear();
+            availableIndexes = allPossibleIndexes;
         }
 
-        shuffleArray(availableQuestions);
-        shuffledQuestions = availableQuestions.slice(0, EXAM_LENGTH);
+        shuffleArray(availableIndexes);
+        const newQuestionIndexes = availableIndexes.slice(0, EXAM_LENGTH);
         
+        newQuestionIndexes.forEach(index => usedIndexes.add(index));
+        sessionStorage.setItem('usedIndexes', JSON.stringify(Array.from(usedIndexes)));
+
+        return newQuestionIndexes.map(index => allQuestions[index]);
+    }
+    
+    function startQuiz() {
+        switchScreen(quizScreen);
+        
+        currentQuestions = getNewQuestions();
         currentQuestionIndex = 0;
         score = 0;
         userAnswers = [];
@@ -364,7 +397,8 @@
     
     function showQuestion() {
         resetState();
-        const currentQuestion = shuffledQuestions[currentQuestionIndex];
+        const currentQuestion = currentQuestions[currentQuestionIndex];
+        
         questionCounterElem.textContent = `Pregunta ${currentQuestionIndex + 1} de ${EXAM_LENGTH}`;
         progressBar.style.width = `${((currentQuestionIndex) / EXAM_LENGTH) * 100}%`;
         questionTextElem.textContent = currentQuestion.question;
@@ -386,7 +420,7 @@
     function selectAnswer(selectedOptionElement, selectedOptionText) {
         if (document.querySelector('.option.correct, .option.incorrect')) return;
         
-        const currentQuestion = shuffledQuestions[currentQuestionIndex];
+        const currentQuestion = currentQuestions[currentQuestionIndex];
         const isCorrect = selectedOptionText === currentQuestion.correctAnswer;
         
         selectedOptionElement.classList.add(isCorrect ? 'correct' : 'incorrect');
@@ -405,18 +439,21 @@
 
         setTimeout(() => {
             currentQuestionIndex++;
-            if (currentQuestionIndex < EXAM_LENGTH) {
-                showQuestion();
-            } else {
-                clearInterval(timerInterval);
-                showResults();
-            }
+            showNext();
         }, 1200);
+    }
+
+    function showNext() {
+        if (currentQuestionIndex < EXAM_LENGTH) {
+            showQuestion();
+        } else {
+            clearInterval(timerInterval);
+            showResults();
+        }
     }
     
     function showResults() {
         switchScreen(resultsScreen);
-        closeBtn.style.display = 'none';
         progressBar.style.width = '100%';
         const finalScore = Math.round((score / EXAM_LENGTH) * 100);
         
@@ -449,24 +486,10 @@
             li.innerHTML = reviewHTML;
             reviewListElem.appendChild(li);
         });
-        
-        setUsedQuestions(shuffledQuestions);
-    }
-
-    function goHome() {
-        clearInterval(timerInterval);
-        switchScreen(startScreen);
-        closeBtn.style.display = 'none';
     }
 
     startBtn.addEventListener('click', startQuiz);
     restartBtn.addEventListener('click', startQuiz);
-    closeBtn.addEventListener('click', () => {
-        if (confirm("¿Estás seguro de que quieres abandonar el examen? Tu progreso se perderá.")) {
-            goHome();
-        }
-    });
-
 </script>
 </body>
 </html>
