@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador Profesional V2.2 - Examen de Conducir Argentina</title>
+    <title>Simulador Profesional V2.3 - Examen de Conducir Argentina</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
         
@@ -101,7 +101,6 @@
         .option.disabled { cursor: not-allowed; }
         .option.disabled:not(.correct):not(.incorrect) { opacity: 0.6; }
 
-
         @media (hover: hover) and (pointer: fine) {
             .option:not(.disabled):hover {
                 transform: translateY(-2px);
@@ -150,8 +149,9 @@
                 <p>Edición Profesional 2024 - Argentina</p>
             </div>
             <p>
-                Prepárate para tu examen con 40 preguntas aleatorias que cubren todos los temas del curso oficial.
-                <br>Tienes <b>45 minutos</b> para completar la prueba.
+                Te enfrentarás a 40 preguntas aleatorias de un banco de más de 90. Tendrás <b>45 minutos</b> para completar la prueba.
+                <br><b>El sistema evita repetir preguntas que ya has visto en sesiones anteriores.</b>
+                <br>¡Mucha suerte!
             </p>
             <button id="start-btn" class="btn">Comenzar Examen</button>
         </div>
@@ -192,6 +192,7 @@
     </div>
 
 <script>
+    // --- BANCO DE PREGUNTAS COMPLETO ---
     const allQuestions = [
         { question: "El concepto de 'conducción a la defensiva' se refiere a:", options: ["Conducir agresivamente para imponerse", "Anticiparse a los posibles errores de los demás y a las condiciones del entorno", "Ceder siempre el paso, incluso cuando se tiene prioridad", "Utilizar el vehículo solo para lo estrictamente necesario"], correctAnswer: "Anticiparse a los posibles errores de los demás y a las condiciones del entorno" },
         { question: "En el trato con otros usuarios de la vía, el conductor debe ser:", options: ["Competitivo y rápido", "Indiferente, concentrándose solo en su propio manejo", "Cortés, solidario y respetuoso", "Rápido para no entorpecer el tránsito"], correctAnswer: "Cortés, solidario y respetuoso" },
@@ -248,8 +249,7 @@
     const resultsScreen = document.getElementById('results-screen');
     const startBtn = document.getElementById('start-btn');
     const restartBtn = document.getElementById('restart-btn');
-    const closeBtn = document.getElementById('close-btn');
-
+    
     const questionCounterElem = document.getElementById('question-counter');
     const timerElem = document.getElementById('timer');
     const progressBar = document.getElementById('progress-bar');
@@ -281,6 +281,27 @@
         screen.classList.add('active');
     }
     
+    // *** FUNCIONES CORREGIDAS ***
+    function getUsedQuestions() {
+        try {
+            const used = sessionStorage.getItem(USED_QUESTIONS_KEY);
+            return used ? JSON.parse(used) : [];
+        } catch (e) {
+            console.error("Error al leer de sessionStorage:", e);
+            return [];
+        }
+    }
+
+    function setUsedQuestions(questions) {
+        try {
+            const used = getUsedQuestions();
+            const newUsed = [...used, ...questions.map(q => q.question)];
+            sessionStorage.setItem(USED_QUESTIONS_KEY, JSON.stringify(newUsed));
+        } catch (e) {
+            console.error("Error al escribir en sessionStorage:", e);
+        }
+    }
+
     function startQuiz() {
         switchScreen(quizScreen);
         
@@ -289,7 +310,7 @@
             sessionStorage.removeItem(USED_QUESTIONS_KEY);
             availableQuestions = allQuestions;
         }
-        
+
         shuffleArray(availableQuestions);
         shuffledQuestions = availableQuestions.slice(0, EXAM_LENGTH);
         
@@ -306,16 +327,16 @@
         clearInterval(timerInterval); 
         
         const updateTimer = () => {
-            if (timeLeft <= 0) {
+            if (timeLeft < 0) { // Usar < 0 para que muestre 00:00 antes de terminar
                 clearInterval(timerInterval);
                 alert("¡Se acabó el tiempo!");
                 showResults();
                 return;
             }
-            timeLeft--;
             const minutes = Math.floor(timeLeft / 60);
             const seconds = timeLeft % 60;
             timerElem.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            timeLeft--;
         };
         
         updateTimer(); 
@@ -326,7 +347,7 @@
         resetState();
         const currentQuestion = shuffledQuestions[currentQuestionIndex];
         questionCounterElem.textContent = `Pregunta ${currentQuestionIndex + 1} de ${EXAM_LENGTH}`;
-        progressBar.style.width = `${((currentQuestionIndex + 1) / EXAM_LENGTH) * 100}%`;
+        progressBar.style.width = `${((currentQuestionIndex) / EXAM_LENGTH) * 100}%`;
         questionTextElem.textContent = currentQuestion.question;
 
         currentQuestion.options.forEach(optionText => {
@@ -344,16 +365,15 @@
     }
 
     function selectAnswer(event, selectedOptionElement, selectedOptionText) {
-        if (document.querySelector('.option.selected')) return;
+        if (document.querySelector('.option.selected, .option.correct, .option.incorrect')) return;
         
         const currentQuestion = shuffledQuestions[currentQuestionIndex];
         const isCorrect = selectedOptionText === currentQuestion.correctAnswer;
         
+        selectedOptionElement.classList.add(isCorrect ? 'correct' : 'incorrect');
         if (isCorrect) {
-            selectedOptionElement.classList.add('correct');
             score++;
         } else {
-            selectedOptionElement.classList.add('incorrect');
             Array.from(answerOptionsElem.children).forEach(opt => {
                 if (opt.textContent === currentQuestion.correctAnswer) {
                     opt.classList.add('correct');
@@ -361,7 +381,7 @@
             });
         }
         
-        userAnswers.push({ question: currentQuestion.question, userAnswer: selectedOptionText, correctAnswer: currentQuestion.correctAnswer, isCorrect: isCorrect });
+        userAnswers.push({ question: currentQuestion.question, userAnswer: selectedOptionText, correctAnswer: currentQuestion.correctAnswer, isCorrect });
         document.querySelectorAll('.option').forEach(opt => opt.classList.add('disabled'));
 
         setTimeout(() => {
@@ -377,6 +397,7 @@
     
     function showResults() {
         switchScreen(resultsScreen);
+        progressBar.style.width = '100%';
         const finalScore = Math.round((score / EXAM_LENGTH) * 100);
         
         scorePercentageElem.textContent = `${finalScore}%`;
