@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador Profesional con Temporizador - Examen de Conducir Argentina</title>
+    <title>Simulador Profesional Responsivo - Examen de Conducir Argentina</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+        
         body { font-family: 'Roboto', sans-serif; background-color: #f0f4f8; color: #333; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; box-sizing: border-box; }
         .container { background-color: #ffffff; border-radius: 10px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); width: 100%; max-width: 800px; padding: 30px; box-sizing: border-box; }
         .header { text-align: center; border-bottom: 2px solid #00a1b2; padding-bottom: 20px; margin-bottom: 20px; }
@@ -16,88 +17,35 @@
         #start-btn, #restart-btn { background-color: #00a1b2; color: white; border: none; padding: 15px 30px; font-size: 1.2em; border-radius: 5px; cursor: pointer; transition: background-color 0.3s; margin-top: 20px; font-weight: 700; }
         #start-btn:hover, #restart-btn:hover { background-color: #007b8a; }
         #quiz-container { display: none; }
+        .quiz-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        #question-counter { font-size: 1em; font-weight: 500; color: #555; }
+        #timer { font-size: 1.1em; font-weight: 700; color: #005a7d; background-color: #e0f7fa; padding: 5px 15px; border-radius: 20px; }
+        #question-text { font-size: 1.4em; font-weight: 700; margin-bottom: 25px; line-height: 1.4; }
+        #answer-options { display: flex; flex-direction: column; gap: 15px; }
+        .option { background-color: #f8f9fa; border: 2px solid #dee2e6; padding: 15px; border-radius: 5px; cursor: pointer; transition: all 0.2s; text-align: left; font-size: 1em; }
         
-        .quiz-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
+        /* --- CORRECCIÓN CLAVE PARA MÓVILES --- */
+        /* Aplicar efecto hover solo en dispositivos con puntero (mouse) */
+        @media (hover: hover) and (pointer: fine) {
+            .option:hover { 
+                background-color: #e9ecef; 
+                border-color: #00a1b2; 
+            }
         }
-
-        #question-counter { 
-            font-size: 1em; 
-            font-weight: 500; 
-            color: #555; 
-        }
-
-        #timer {
-            font-size: 1.1em;
-            font-weight: 700;
-            color: #005a7d;
-            background-color: #e0f7fa;
-            padding: 5px 15px;
-            border-radius: 20px;
-        }
-
-        #question-text { 
-            font-size: 1.4em; 
-            font-weight: 700; 
-            margin-bottom: 25px; 
-            line-height: 1.4;
-        }
-        #answer-options { 
-            display: flex; 
-            flex-direction: column; 
-            gap: 15px; 
-        }
-        .option { 
-            background-color: #f8f9fa; 
-            border: 2px solid #dee2e6; 
-            padding: 15px; 
-            border-radius: 5px; 
-            cursor: pointer; 
-            transition: all 0.2s; 
-            text-align: left; 
-            font-size: 1em;
-        }
-        .option:hover { 
-            background-color: #e9ecef; 
-            border-color: #00a1b2; 
-        }
-        .option.selected { 
-            background-color: #d1ecf1; 
-            border-color: #007b8a; 
-            font-weight: 500; 
-        }
-        #results-container { 
-            display: none; 
-        }
-        #score-text { 
-            font-size: 2.5em; 
-            font-weight: 700; 
-            margin-bottom: 20px; 
-        }
+        
+        .option.selected { background-color: #d1ecf1; border-color: #007b8a; font-weight: 500; }
+        #results-container { display: none; }
+        #score-text { font-size: 2.5em; font-weight: 700; margin-bottom: 20px; }
         .score-pass { color: #28a745; }
         .score-fail { color: #dc3545; }
-        #review-list { 
-            list-style: none; 
-            padding: 0; 
-            text-align: left; 
-            max-height: 400px; 
-            overflow-y: auto; 
-        }
-        #review-list li { 
-            background-color: #f8f9fa; 
-            border-radius: 5px; 
-            padding: 15px; 
-            margin-bottom: 10px; 
-            border-left: 5px solid; 
-        }
+        #review-list { list-style: none; padding: 0; text-align: left; max-height: 400px; overflow-y: auto; }
+        #review-list li { background-color: #f8f9fa; border-radius: 5px; padding: 15px; margin-bottom: 10px; border-left: 5px solid; }
         #review-list li.correct { border-color: #28a745; }
         #review-list li.incorrect { border-color: #dc3545; }
         .question-review { font-weight: bold; margin-bottom: 8px; }
         .answer-review { margin-top: 8px; }
 
+        /* Media Query para responsividad general */
         @media (max-width: 768px) {
             body { padding: 10px; }
             .container { padding: 15px; }
@@ -356,11 +304,11 @@ const answerOptionsElem = document.getElementById('answer-options');
 const scoreTextElem = document.getElementById('score-text');
 const scoreMessageElem = document.getElementById('score-message');
 const reviewListElem = document.getElementById('review-list');
-
 let shuffledQuestions, currentQuestionIndex, score, userAnswers;
 const EXAM_LENGTH = 40;
 const TIME_LIMIT = 45 * 60; // 45 minutos en segundos
 let timerInterval;
+const USED_QUESTIONS_KEY = 'usedDrivingTestQuestions';
 
 function shuffleArray(array) {
     for (let i = array.length - 1; i > 0; i--) {
@@ -369,39 +317,70 @@ function shuffleArray(array) {
     }
 }
 
+function getUsedQuestions() {
+    try {
+        const used = sessionStorage.getItem(USED_QUESTIONS_KEY);
+        return used ? JSON.parse(used) : [];
+    } catch (e) {
+        console.error("Error al leer de sessionStorage:", e);
+        return [];
+    }
+}
+
+function setUsedQuestions(questions) {
+    try {
+        const used = getUsedQuestions();
+        const newUsed = [...used, ...questions.map(q => q.question)];
+        sessionStorage.setItem(USED_QUESTIONS_KEY, JSON.stringify(newUsed));
+    } catch (e) {
+        console.error("Error al escribir en sessionStorage:", e);
+    }
+}
+
 function startQuiz() {
     startScreen.style.display = 'none';
     resultsContainer.style.display = 'none';
     quizContainer.style.display = 'block';
 
-    shuffledQuestions = [...allQuestions]; // Usamos copia para no alterar el original
-    shuffleArray(shuffledQuestions);
-    shuffledQuestions = shuffledQuestions.slice(0, EXAM_LENGTH);
+    const usedQuestions = getUsedQuestions();
+    let availableQuestions = allQuestions.filter(q => !usedQuestions.includes(q.question));
+
+    if (availableQuestions.length < EXAM_LENGTH) {
+        console.log("Se han agotado las preguntas únicas. Reiniciando el banco de preguntas.");
+        sessionStorage.removeItem(USED_QUESTIONS_KEY);
+        availableQuestions = allQuestions;
+    }
+
+    shuffleArray(availableQuestions);
+    shuffledQuestions = availableQuestions.slice(0, EXAM_LENGTH);
+    setUsedQuestions(shuffledQuestions);
     
     currentQuestionIndex = 0;
     score = 0;
     userAnswers = [];
-    
+
     startTimer();
     showQuestion();
 }
 
 function startTimer() {
     let timeLeft = TIME_LIMIT;
-    clearInterval(timerInterval); // Limpiar cualquier temporizador anterior
+    clearInterval(timerInterval); 
 
-    timerInterval = setInterval(() => {
+    const updateTimer = () => {
         timeLeft--;
         const minutes = Math.floor(timeLeft / 60);
         const seconds = timeLeft % 60;
         timerElem.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-
         if (timeLeft <= 0) {
             clearInterval(timerInterval);
             alert("¡Se acabó el tiempo!");
             showResults();
         }
-    }, 1000);
+    };
+    
+    updateTimer(); // Llama una vez para que no haya un segundo de retraso al inicio
+    timerInterval = setInterval(updateTimer, 1000);
 }
 
 function showQuestion() {
@@ -421,16 +400,21 @@ function showQuestion() {
 
 function resetState() {
     answerOptionsElem.innerHTML = '';
-    // Desenfocar cualquier elemento activo para evitar el "auto-hover" en móviles
     if (document.activeElement) document.activeElement.blur();
 }
 
 function selectAnswer(event, selectedOptionText) {
-    // Evitar doble clic
     if (document.querySelector('.option.selected')) return;
     
     const selectedOptionElement = event.currentTarget;
     selectedOptionElement.classList.add('selected');
+
+    // Desactivar las otras opciones para evitar clics múltiples
+    document.querySelectorAll('.option').forEach(opt => {
+        if (!opt.classList.contains('selected')) {
+            opt.style.pointerEvents = 'none';
+        }
+    });
 
     const currentQuestion = shuffledQuestions[currentQuestionIndex];
     const isCorrect = selectedOptionText === currentQuestion.correctAnswer;
@@ -449,7 +433,7 @@ function selectAnswer(event, selectedOptionText) {
         if (currentQuestionIndex < EXAM_LENGTH) {
             showQuestion();
         } else {
-            clearInterval(timerInterval); // Detener el tiempo al terminar
+            clearInterval(timerInterval);
             showResults();
         }
     }, 400);
