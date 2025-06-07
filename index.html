@@ -3,13 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador de Examen de Conducir - Argentina (Pro)</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <title>Simulador Profesional V2.2 - Examen de Conducir Argentina</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+        
         :root {
-            --primary-color: #007BFF; /* Un azul moderno y confiable */
+            --primary-color: #007BFF;
             --primary-hover-color: #0056b3;
             --success-color: #28a745;
             --danger-color: #dc3545;
@@ -28,27 +27,26 @@
             padding: 0;
         }
 
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--background-color);
-            color: var(--text-primary-color);
-            display: flex;
-            justify-content: center;
-            align-items: center;
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: var(--background-color); 
+            color: var(--text-primary-color); 
+            margin: 0; 
+            padding: 20px; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
             min-height: 100vh;
-            padding: 20px;
         }
-
-        .main-container {
-            background-color: var(--surface-color);
-            border-radius: var(--border-radius);
-            box-shadow: var(--box-shadow);
-            width: 100%;
-            max-width: 800px;
-            padding: 40px;
+        .main-container { 
+            background-color: var(--surface-color); 
+            border-radius: var(--border-radius); 
+            box-shadow: var(--box-shadow); 
+            width: 100%; 
+            max-width: 800px; 
+            padding: 40px; 
             position: relative;
             overflow: hidden;
-            transition: all 0.5s ease;
         }
 
         .screen {
@@ -65,26 +63,11 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        .header h1 {
-            color: var(--text-primary-color);
-            font-size: 2em;
-            margin-bottom: 5px;
-        }
-        .header p {
-            font-size: 1.1em;
-            color: var(--text-secondary-color);
-        }
-
-        #start-screen p {
-            font-size: 1.1em;
-            line-height: 1.6;
-            margin: 20px 0;
-        }
-
+        .header { text-align: center; margin-bottom: 30px; }
+        .header h1 { color: var(--text-primary-color); font-size: 2em; margin-bottom: 5px; }
+        .header p { font-size: 1.1em; color: var(--text-secondary-color); }
+        #start-screen p { font-size: 1.1em; line-height: 1.6; margin: 20px 0; }
+        
         .btn {
             background-color: var(--primary-color);
             color: white;
@@ -104,67 +87,20 @@
             box-shadow: 0 4px 15px rgba(0, 123, 255, 0.2);
         }
 
-        .quiz-header {
-            margin-bottom: 20px;
-            position: relative;
-        }
+        .quiz-header { margin-bottom: 20px; position: relative; }
+        #progress-bar-container { width: 100%; height: 8px; background-color: #e9ecef; border-radius: 4px; overflow: hidden; margin-bottom: 20px; }
+        #progress-bar { width: 0%; height: 100%; background-color: var(--primary-color); transition: width 0.4s ease-in-out; }
+        .quiz-info { display: flex; justify-content: space-between; align-items: center; font-weight: 500; color: var(--text-secondary-color); }
+        #timer { font-weight: 700; color: var(--primary-color); }
+        #question-text { font-size: 1.5em; font-weight: 700; margin-bottom: 30px; line-height: 1.4; }
+        #answer-options { display: grid; gap: 15px; }
+        .option { background-color: var(--surface-color); border: 2px solid var(--border-color); padding: 18px 20px; border-radius: var(--border-radius); cursor: pointer; transition: all 0.2s ease; text-align: left; font-size: 1em; font-weight: 500; }
         
-        #progress-bar-container {
-            width: 100%;
-            height: 8px;
-            background-color: #e9ecef;
-            border-radius: 4px;
-            overflow: hidden;
-            margin-bottom: 20px;
-        }
+        .option.correct { background-color: #d4edda; border-color: var(--success-color); color: #155724; }
+        .option.incorrect { background-color: #f8d7da; border-color: var(--danger-color); color: #721c24; }
+        .option.disabled { cursor: not-allowed; }
+        .option.disabled:not(.correct):not(.incorrect) { opacity: 0.6; }
 
-        #progress-bar {
-            width: 0%;
-            height: 100%;
-            background-color: var(--primary-color);
-            transition: width 0.4s ease-in-out;
-        }
-        
-        .quiz-info {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-weight: 500;
-            color: var(--text-secondary-color);
-        }
-
-        #timer {
-            font-weight: 700;
-            color: var(--primary-color);
-        }
-        
-        #question-text {
-            font-size: 1.5em;
-            font-weight: 700;
-            margin-bottom: 30px;
-            line-height: 1.4;
-        }
-
-        #answer-options {
-            display: grid;
-            gap: 15px;
-        }
-
-        .option {
-            background-color: var(--surface-color);
-            border: 2px solid var(--border-color);
-            padding: 18px 20px;
-            border-radius: var(--border-radius);
-            cursor: pointer;
-            transition: all 0.2s ease;
-            text-align: left;
-            font-size: 1em;
-            font-weight: 500;
-        }
-
-        .option.correct { background-color: #d4edda; border-color: var(--success-color); }
-        .option.incorrect { background-color: #f8d7da; border-color: var(--danger-color); }
-        .option.disabled { cursor: not-allowed; opacity: 0.7; }
 
         @media (hover: hover) and (pointer: fine) {
             .option:not(.disabled):hover {
@@ -176,13 +112,12 @@
 
         #results-container h2 { font-size: 1.8em; margin-bottom: 10px; }
         #results-container p { font-size: 1.2em; color: var(--text-secondary-color); margin-bottom: 20px; }
-        #score-display { display: flex; justify-content: center; align-items: center; gap: 30px; margin: 30px 0; }
+        #score-display { display: flex; justify-content: center; align-items: center; gap: 30px; margin: 30px 0; flex-wrap: wrap; }
         .score-circle { width: 120px; height: 120px; border-radius: 50%; display: flex; justify-content: center; align-items: center; flex-direction: column; font-weight: 700; }
         .score-circle.pass { background-color: #28a74520; color: var(--success-color); }
         .score-circle.fail { background-color: #dc354520; color: var(--danger-color); }
         .score-circle span:first-child { font-size: 2.5em; }
         .score-circle span:last-child { font-size: 0.9em; text-transform: uppercase; }
-
         .score-details { text-align: left; }
         .score-details p { font-size: 1.1em; margin: 5px 0; color: var(--text-primary-color); }
         .score-details span { font-weight: 700; }
@@ -193,11 +128,22 @@
         #review-list li.incorrect { border-color: var(--danger-color); }
         .question-review { font-weight: bold; margin-bottom: 8px; }
         .answer-review { margin-top: 8px; font-size: 0.95em; }
+
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .main-container { padding: 20px; }
+            .header h1 { font-size: 1.5em; }
+            #question-text { font-size: 1.2em; }
+            .option { padding: 15px; font-size: 0.95em; }
+            .btn { padding: 15px 30px; font-size: 1em; }
+            #score-text { font-size: 2em; }
+            .quiz-info { font-size: 0.9em; }
+        }
     </style>
 </head>
 <body>
     <div class="main-container">
-        <!-- Pantalla de Inicio -->
+        
         <div id="start-screen" class="screen active">
             <div class="header">
                 <h1>Simulador de Examen de Conducir</h1>
@@ -210,7 +156,6 @@
             <button id="start-btn" class="btn">Comenzar Examen</button>
         </div>
 
-        <!-- Pantalla del Examen -->
         <div id="quiz-screen" class="screen">
             <div class="quiz-header">
                 <div id="progress-bar-container">
@@ -225,7 +170,6 @@
             <div id="answer-options"></div>
         </div>
 
-        <!-- Pantalla de Resultados -->
         <div id="results-screen" class="screen">
             <div class="header">
                 <h1>Resultados del Examen</h1>
@@ -237,9 +181,9 @@
                     <span>Puntos</span>
                 </div>
                 <div class="score-details">
-                    <p>Respuestas Correctas: <span id="correct-answers"></span></p>
-                    <p>Respuestas Incorrectas: <span id="incorrect-answers"></span></p>
-                    <p>Total de Preguntas: <span id="total-questions"></span></p>
+                    <p>Correctas: <span id="correct-answers"></span></p>
+                    <p>Incorrectas: <span id="incorrect-answers"></span></p>
+                    <p>Total: <span id="total-questions"></span></p>
                 </div>
             </div>
             <ul id="review-list"></ul>
@@ -248,7 +192,6 @@
     </div>
 
 <script>
-    // --- BANCO DE PREGUNTAS COMPLETO Y CORREGIDO ---
     const allQuestions = [
         { question: "El concepto de 'conducción a la defensiva' se refiere a:", options: ["Conducir agresivamente para imponerse", "Anticiparse a los posibles errores de los demás y a las condiciones del entorno", "Ceder siempre el paso, incluso cuando se tiene prioridad", "Utilizar el vehículo solo para lo estrictamente necesario"], correctAnswer: "Anticiparse a los posibles errores de los demás y a las condiciones del entorno" },
         { question: "En el trato con otros usuarios de la vía, el conductor debe ser:", options: ["Competitivo y rápido", "Indiferente, concentrándose solo en su propio manejo", "Cortés, solidario y respetuoso", "Rápido para no entorpecer el tránsito"], correctAnswer: "Cortés, solidario y respetuoso" },
@@ -297,7 +240,7 @@
         { question: "La 'impericia' se refiere a:", options: ["La falta de habilidad o experiencia para ejecutar una maniobra", "Conducir de manera agresiva", "No respetar las señales de tránsito", "Exceder los límites de velocidad"], correctAnswer: "La falta de habilidad o experiencia para ejecutar una maniobra" },
         { question: "Una señal circular con borde rojo que muestra el pictograma de una bocina tachada significa:", options: ["Prohibido usar la radio a alto volumen", "Zona de silencio hospitalario", "Prohibido el uso de la bocina o señales acústicas", "Fin de la prohibición de ruidos"], correctAnswer: "Prohibido el uso de la bocina o señales acústicas" },
         { question: "Un matafuegos de 1kg (tipo ABC), ¿es adecuado para un automóvil particular?", options: ["No, se necesita uno de 5kg para ser efectivo", "Sí, es el tipo y tamaño reglamentario para automóviles", "Solo si el auto es a gasoil, los nafteros no lo necesitan", "No, el matafuegos es opcional en autos particulares"], correctAnswer: "Sí, es el tipo y tamaño reglamentario para automóviles" }
-];
+    ];
 
     // --- LÓGICA DEL SIMULADOR ---
     const startScreen = document.getElementById('start-screen');
@@ -306,6 +249,7 @@
     const startBtn = document.getElementById('start-btn');
     const restartBtn = document.getElementById('restart-btn');
     const closeBtn = document.getElementById('close-btn');
+
     const questionCounterElem = document.getElementById('question-counter');
     const timerElem = document.getElementById('timer');
     const progressBar = document.getElementById('progress-bar');
@@ -339,13 +283,13 @@
     
     function startQuiz() {
         switchScreen(quizScreen);
-
+        
         let availableQuestions = allQuestions.filter(q => !getUsedQuestions().includes(q.question));
         if (availableQuestions.length < EXAM_LENGTH) {
             sessionStorage.removeItem(USED_QUESTIONS_KEY);
             availableQuestions = allQuestions;
         }
-
+        
         shuffleArray(availableQuestions);
         shuffledQuestions = availableQuestions.slice(0, EXAM_LENGTH);
         
@@ -356,24 +300,28 @@
         startTimer();
         showQuestion();
     }
-
+    
     function startTimer() {
         let timeLeft = TIME_LIMIT;
-        clearInterval(timerInterval);
-
-        timerInterval = setInterval(() => {
-            timeLeft--;
-            const minutes = Math.floor(timeLeft / 60);
-            const seconds = timeLeft % 60;
-            timerElem.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        clearInterval(timerInterval); 
+        
+        const updateTimer = () => {
             if (timeLeft <= 0) {
                 clearInterval(timerInterval);
                 alert("¡Se acabó el tiempo!");
                 showResults();
+                return;
             }
-        }, 1000);
+            timeLeft--;
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            timerElem.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        };
+        
+        updateTimer(); 
+        timerInterval = setInterval(updateTimer, 1000);
     }
-
+    
     function showQuestion() {
         resetState();
         const currentQuestion = shuffledQuestions[currentQuestionIndex];
@@ -396,26 +344,24 @@
     }
 
     function selectAnswer(event, selectedOptionElement, selectedOptionText) {
-        if (selectedOptionElement.classList.contains('correct') || selectedOptionElement.classList.contains('incorrect')) return;
-
+        if (document.querySelector('.option.selected')) return;
+        
         const currentQuestion = shuffledQuestions[currentQuestionIndex];
         const isCorrect = selectedOptionText === currentQuestion.correctAnswer;
-
+        
         if (isCorrect) {
             selectedOptionElement.classList.add('correct');
             score++;
         } else {
             selectedOptionElement.classList.add('incorrect');
-            // Muestra la correcta
             Array.from(answerOptionsElem.children).forEach(opt => {
                 if (opt.textContent === currentQuestion.correctAnswer) {
                     opt.classList.add('correct');
                 }
             });
         }
-
-        userAnswers.push({ question: currentQuestion.question, userAnswer: selectedOptionText, correctAnswer: currentQuestion.correctAnswer, isCorrect });
         
+        userAnswers.push({ question: currentQuestion.question, userAnswer: selectedOptionText, correctAnswer: currentQuestion.correctAnswer, isCorrect: isCorrect });
         document.querySelectorAll('.option').forEach(opt => opt.classList.add('disabled'));
 
         setTimeout(() => {
@@ -428,7 +374,7 @@
             }
         }, 1200);
     }
-
+    
     function showResults() {
         switchScreen(resultsScreen);
         const finalScore = Math.round((score / EXAM_LENGTH) * 100);
@@ -439,7 +385,7 @@
         totalQuestionsElem.textContent = EXAM_LENGTH;
         reviewListElem.innerHTML = '';
 
-        if (finalScore >= 75) { // Umbral de aprobación común
+        if (finalScore >= 75) {
             resultMessageElem.textContent = '¡Excelente! Has aprobado el examen.';
             scoreCircleElem.classList.add('pass');
             scoreCircleElem.classList.remove('fail');
@@ -463,7 +409,6 @@
             reviewListElem.appendChild(li);
         });
         
-        // Guardar las preguntas de este examen para no repetirlas
         setUsedQuestions(shuffledQuestions);
     }
 
