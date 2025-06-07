@@ -3,520 +3,472 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador Profesional V2.1 - Examen de Conducir Argentina</title>
+    <title>Simulador de Examen de Conducir - Argentina (Pro)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
-        
         :root {
-            --primary-color: #00a1b2;
-            --primary-dark-color: #007b8a;
-            --background-color: #f0f4f8;
-            --container-bg-color: #ffffff;
-            --text-color: #333;
-            --header-color: #005a7d;
+            --primary-color: #007BFF; /* Un azul moderno y confiable */
+            --primary-hover-color: #0056b3;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --background-color: #f4f7f9;
+            --surface-color: #ffffff;
+            --text-primary-color: #212529;
+            --text-secondary-color: #6c757d;
+            --border-color: #dee2e6;
+            --border-radius: 12px;
+            --box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
         }
 
-        body { 
-            font-family: 'Roboto', sans-serif; 
-            background-color: var(--background-color); 
-            color: var(--text-color); 
-            margin: 0; 
-            padding: 20px; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            min-height: 100vh;
+        * {
             box-sizing: border-box;
-        }
-        .container { 
-            background-color: var(--container-bg-color); 
-            border-radius: 10px; 
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); 
-            width: 100%; 
-            max-width: 800px; 
-            padding: 30px; 
-            box-sizing: border-box; 
-            position: relative; /* Para posicionar el botón de cerrar */
-        }
-        .header { 
-            text-align: center; 
-            border-bottom: 2px solid var(--primary-color); 
-            padding-bottom: 20px; 
-            margin-bottom: 20px; 
-        }
-        .header h1 { 
-            color: var(--header-color); 
-            margin: 0; 
-            font-size: 2em;
-        }
-        .header p {
-            font-size: 1em;
-            color: #555;
-        }
-        #start-screen, #results-container { 
-            text-align: center; 
-        }
-        #start-screen p { 
-            font-size: 1.1em; 
-            line-height: 1.6; 
-        }
-        #start-btn, #restart-btn-icon { 
-            background-color: var(--primary-color); 
-            color: white; 
-            border: none; 
-            padding: 15px 30px; 
-            font-size: 1.2em; 
-            border-radius: 5px; 
-            cursor: pointer; 
-            transition: background-color 0.3s; 
-            margin-top: 20px;
-            font-weight: 700;
-        }
-        #start-btn:hover { 
-            background-color: var(--primary-dark-color); 
-        }
-        #quiz-container { 
-            display: none; 
-        }
-        
-        .quiz-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
+            margin: 0;
+            padding: 0;
         }
 
-        #question-counter { 
-            font-size: 1em; 
-            font-weight: 500; 
-            color: #555; 
-        }
-
-        #timer {
-            font-size: 1.1em;
-            font-weight: 700;
-            color: var(--header-color);
-            background-color: #e0f7fa;
-            padding: 5px 15px;
-            border-radius: 20px;
-        }
-
-        #question-text { 
-            font-size: 1.4em; 
-            font-weight: 700; 
-            margin-bottom: 25px; 
-            line-height: 1.4;
-        }
-        #answer-options { 
-            display: flex; 
-            flex-direction: column; 
-            gap: 15px; 
-        }
-        .option { 
-            background-color: #f8f9fa; 
-            border: 2px solid #dee2e6; 
-            padding: 15px; 
-            border-radius: 8px; 
-            cursor: pointer; 
-            transition: all 0.2s; 
-            text-align: left; 
-            font-size: 1em;
-        }
-        
-        @media (hover: hover) and (pointer: fine) {
-            .option:hover { 
-                background-color: #e9ecef; 
-                border-color: var(--primary-color); 
-            }
-        }
-        
-        .option.selected { background-color: #d1ecf1; border-color: var(--primary-dark-color); font-weight: 500; }
-        #results-container { 
-            display: none; 
-        }
-        #score-text { 
-            font-size: 2.5em; 
-            font-weight: 700; 
-            margin-bottom: 20px; 
-        }
-        .score-pass { color: #28a745; }
-        .score-fail { color: #dc3545; }
-        #review-list { 
-            list-style: none; 
-            padding: 0; 
-            text-align: left; 
-            max-height: 400px; 
-            overflow-y: auto; 
-        }
-        #review-list li { 
-            background-color: #f8f9fa; 
-            border-radius: 5px; 
-            padding: 15px; 
-            margin-bottom: 10px; 
-            border-left: 5px solid; 
-        }
-        #review-list li.correct { border-color: #28a745; }
-        #review-list li.incorrect { border-color: #dc3545; }
-        .question-review { font-weight: bold; margin-bottom: 8px; }
-        .answer-review { margin-top: 8px; }
-
-        .icon-btn {
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 8px;
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            opacity: 0.6;
-            transition: opacity 0.3s;
-        }
-        .icon-btn:hover {
-            opacity: 1;
-        }
-        .icon-btn svg {
-            width: 24px;
-            height: 24px;
-            stroke: #555;
-            stroke-width: 2.5;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-        }
-        
-        #restart-btn-icon {
-            background-color: var(--primary-color);
-            border-radius: 50%;
-            width: 60px;
-            height: 60px;
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-primary-color);
             display: flex;
             justify-content: center;
             align-items: center;
-            margin: 20px auto 0;
-            padding: 0;
-            transition: background-color 0.3s, transform 0.3s;
+            min-height: 100vh;
+            padding: 20px;
         }
-        #restart-btn-icon:hover {
-            background-color: var(--primary-dark-color);
-            transform: rotate(90deg);
-        }
-        #restart-btn-icon svg {
-            width: 32px;
-            height: 32px;
-            stroke: white;
-        }
-        #close-btn { display: none; }
 
-        @media (max-width: 768px) {
-            body { padding: 10px; }
-            .container { padding: 15px; }
-            .header h1 { font-size: 1.5em; }
-            .header p { font-size: 0.9em; }
-            #question-text { font-size: 1.1em; }
-            .option { padding: 12px; font-size: 0.9em; }
-            #start-btn { padding: 12px 25px; font-size: 1em; }
-            #restart-btn-icon { width: 50px; height: 50px; }
-            #restart-btn-icon svg { width: 28px; height: 28px; }
-            #score-text { font-size: 2em; }
-            .quiz-header { flex-direction: column; gap: 10px; }
-            .icon-btn { top: 10px; right: 10px; }
+        .main-container {
+            background-color: var(--surface-color);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            width: 100%;
+            max-width: 800px;
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.5s ease;
         }
+
+        .screen {
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            color: var(--text-primary-color);
+            font-size: 2em;
+            margin-bottom: 5px;
+        }
+        .header p {
+            font-size: 1.1em;
+            color: var(--text-secondary-color);
+        }
+
+        #start-screen p {
+            font-size: 1.1em;
+            line-height: 1.6;
+            margin: 20px 0;
+        }
+
+        .btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 15px 35px;
+            font-size: 1.1em;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 700;
+            display: inline-block;
+            text-decoration: none;
+        }
+        .btn:hover {
+            background-color: var(--primary-hover-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 123, 255, 0.2);
+        }
+
+        .quiz-header {
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        #progress-bar-container {
+            width: 100%;
+            height: 8px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        #progress-bar {
+            width: 0%;
+            height: 100%;
+            background-color: var(--primary-color);
+            transition: width 0.4s ease-in-out;
+        }
+        
+        .quiz-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 500;
+            color: var(--text-secondary-color);
+        }
+
+        #timer {
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        
+        #question-text {
+            font-size: 1.5em;
+            font-weight: 700;
+            margin-bottom: 30px;
+            line-height: 1.4;
+        }
+
+        #answer-options {
+            display: grid;
+            gap: 15px;
+        }
+
+        .option {
+            background-color: var(--surface-color);
+            border: 2px solid var(--border-color);
+            padding: 18px 20px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: left;
+            font-size: 1em;
+            font-weight: 500;
+        }
+
+        .option.correct { background-color: #d4edda; border-color: var(--success-color); }
+        .option.incorrect { background-color: #f8d7da; border-color: var(--danger-color); }
+        .option.disabled { cursor: not-allowed; opacity: 0.7; }
+
+        @media (hover: hover) and (pointer: fine) {
+            .option:not(.disabled):hover {
+                transform: translateY(-2px);
+                border-color: var(--primary-color);
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            }
+        }
+
+        #results-container h2 { font-size: 1.8em; margin-bottom: 10px; }
+        #results-container p { font-size: 1.2em; color: var(--text-secondary-color); margin-bottom: 20px; }
+        #score-display { display: flex; justify-content: center; align-items: center; gap: 30px; margin: 30px 0; }
+        .score-circle { width: 120px; height: 120px; border-radius: 50%; display: flex; justify-content: center; align-items: center; flex-direction: column; font-weight: 700; }
+        .score-circle.pass { background-color: #28a74520; color: var(--success-color); }
+        .score-circle.fail { background-color: #dc354520; color: var(--danger-color); }
+        .score-circle span:first-child { font-size: 2.5em; }
+        .score-circle span:last-child { font-size: 0.9em; text-transform: uppercase; }
+
+        .score-details { text-align: left; }
+        .score-details p { font-size: 1.1em; margin: 5px 0; color: var(--text-primary-color); }
+        .score-details span { font-weight: 700; }
+        
+        #review-list { list-style: none; padding: 0; text-align: left; max-height: 300px; overflow-y: auto; margin-top: 20px; }
+        #review-list li { background-color: #f8f9fa; border-radius: 8px; padding: 15px; margin-bottom: 10px; border-left: 5px solid; }
+        #review-list li.correct { border-color: var(--success-color); }
+        #review-list li.incorrect { border-color: var(--danger-color); }
+        .question-review { font-weight: bold; margin-bottom: 8px; }
+        .answer-review { margin-top: 8px; font-size: 0.95em; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <button id="close-btn" class="icon-btn" title="Cerrar Examen">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
-                <path d="M18 6L6 18"></path>
-                <path d="M6 6L18 18"></path>
-            </svg>
-        </button>
-
-        <div class="header">
-            <h1>Simulador Profesional de Examen de Conducir</h1>
-            <p>Basado en el Curso Nacional de Educación Vial Digital de Argentina</p>
-        </div>
-
-        <div id="start-screen">
-            <h2>¡Listo para tu Examen Simulado!</h2>
-            <p>
-                Te enfrentarás a 40 preguntas aleatorias de un banco de más de 90. Tendrás <b>45 minutos</b> para completar el examen.
-                <br><b>El sistema evita repetir preguntas que ya has visto en sesiones anteriores.</b>
-                <br>¡Mucha suerte!
-            </p>
-            <button id="start-btn">Comenzar Examen</button>
-        </div>
-
-        <div id="quiz-container">
-            <div class="quiz-header">
-                <div id="question-counter"></div>
-                <div id="timer"></div>
+    <div class="main-container">
+        <!-- Pantalla de Inicio -->
+        <div id="start-screen" class="screen active">
+            <div class="header">
+                <h1>Simulador de Examen de Conducir</h1>
+                <p>Edición Profesional 2024 - Argentina</p>
             </div>
-            <div id="question-text"></div>
+            <p>
+                Prepárate para tu examen con 40 preguntas aleatorias que cubren todos los temas del curso oficial.
+                <br>Tienes <b>45 minutos</b> para completar la prueba.
+            </p>
+            <button id="start-btn" class="btn">Comenzar Examen</button>
+        </div>
+
+        <!-- Pantalla del Examen -->
+        <div id="quiz-screen" class="screen">
+            <div class="quiz-header">
+                <div id="progress-bar-container">
+                    <div id="progress-bar"></div>
+                </div>
+                <div class="quiz-info">
+                    <span id="question-counter"></span>
+                    <span id="timer"></span>
+                </div>
+            </div>
+            <h2 id="question-text"></h2>
             <div id="answer-options"></div>
         </div>
 
-        <div id="results-container">
-            <h2>Resultados del Examen</h2>
-            <div id="score-text"></div>
-            <p id="score-message"></p>
-            <h3>Revisión de Respuestas</h3>
+        <!-- Pantalla de Resultados -->
+        <div id="results-screen" class="screen">
+            <div class="header">
+                <h1>Resultados del Examen</h1>
+            </div>
+            <p id="result-message"></p>
+            <div id="score-display">
+                <div id="score-circle" class="score-circle">
+                    <span id="score-percentage"></span>
+                    <span>Puntos</span>
+                </div>
+                <div class="score-details">
+                    <p>Respuestas Correctas: <span id="correct-answers"></span></p>
+                    <p>Respuestas Incorrectas: <span id="incorrect-answers"></span></p>
+                    <p>Total de Preguntas: <span id="total-questions"></span></p>
+                </div>
+            </div>
             <ul id="review-list"></ul>
-            <button id="restart-btn-icon" title="Intentar Nuevo Examen">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
-                    <path d="M20 12C20 16.4183 16.4183 20 12 20C7.58172 20 4 16.4183 4 12C4 7.58172 7.58172 4 12 4"></path>
-                    <path d="M12 4V8"></path>
-                    <path d="M12 4H8"></path>
-                </svg>
-            </button>
+            <button id="restart-btn" class="btn">Volver a Intentar</button>
         </div>
     </div>
 
 <script>
-const allQuestions = [
-    { question: "El concepto de 'conducción a la defensiva' se refiere a:", options: ["Conducir agresivamente para imponerse", "Anticiparse a los posibles errores de los demás y a las condiciones del entorno", "Ceder siempre el paso, incluso cuando se tiene prioridad", "Utilizar el vehículo solo para lo estrictamente necesario"], correctAnswer: "Anticiparse a los posibles errores de los demás y a las condiciones del entorno" },
-    { question: "En el trato con otros usuarios de la vía, el conductor debe ser:", options: ["Competitivo y rápido", "Indiferente, concentrándose solo en su propio manejo", "Cortés, solidario y respetuoso", "Rápido para no entorpecer el tránsito"], correctAnswer: "Cortés, solidario y respetuoso" },
-    { question: "El campo visual de un conductor se reduce a medida que:", options: ["Disminuye la velocidad", "Aumenta la velocidad", "Se hace de día", "El vehículo tiene más espejos"], correctAnswer: "Aumenta la velocidad" },
-    { question: "¿Cuál es el objetivo principal de la Licencia Nacional de Conducir (LNC)?", options: ["Aumentar la recaudación fiscal", "Unificar criterios y requisitos para la habilitación de conductores en todo el país", "Limitar la cantidad de vehículos en circulación", "Facilitar la compra y venta de automotores"], correctAnswer: "Unificar criterios y requisitos para la habilitación de conductores en todo el país" },
-    { question: "Para obtener la licencia de conducir por primera vez, ¿es obligatorio realizar el Curso Nacional de Educación Vial?", options: ["No, es opcional", "Sí, es de carácter obligatorio y gratuito", "Solo es obligatorio para menores de 21 años", "Solo para licencias profesionales"], correctAnswer: "Sí, es de carácter obligatorio y gratuito" },
-    { question: "Los frenos ABS son un elemento de la seguridad:", options: ["Activa, porque ayudan a evitar un siniestro", "Pasiva, porque actúan después del impacto", "Preventiva, porque alertan al conductor", "Estructural, porque forman parte del chasis"], correctAnswer: "Activa, porque ayudan a evitar un siniestro" },
-    { question: "El apoya cabezas, ¿contra qué tipo de lesión protege principalmente?", options: ["Lesiones en las piernas por el tablero", "Golpes en el cráneo contra el parabrisas", "El 'efecto latigazo' en las cervicales durante una colisión trasera", "Deslizamiento del cuerpo por debajo del cinturón"], correctAnswer: "El 'efecto latigazo' en las cervicales durante una colisión trasera" },
-    { question: "Para una conducción eficiente y un menor consumo de combustible, se recomienda:", options: ["Realizar aceleraciones y frenadas bruscas constantemente", "Mantener una velocidad uniforme y evitar cambios de marcha innecesarios", "Circular siempre en la marcha más baja posible para tener más potencia", "Llevar los neumáticos con una presión inferior a la recomendada"], correctAnswer: "Mantener una velocidad uniforme y evitar cambios de marcha innecesarios" },
-    { question: "En una encrucijada urbana sin señalizar, si dos vehículos llegan al mismo tiempo, la prioridad de paso la tiene:", options: ["El vehículo que viene por la derecha del otro", "El que viene por la izquierda", "El que circula por la calle más ancha", "El que tiene intención de girar"], correctAnswer: "El vehículo que viene por la derecha del otro" },
-    { question: "Usted se aproxima a una rotonda. ¿Quién tiene prioridad de paso?", options: ["Usted, porque va a ingresar", "El vehículo que ya se encuentra circulando dentro de la rotonda", "El vehículo que viene por su derecha, aunque aún no haya ingresado a la rotonda", "El vehículo más rápido"], correctAnswer: "El vehículo que ya se encuentra circulando dentro de la rotonda" },
-    { question: "La prioridad absoluta del vehículo que circula por la derecha se pierde ante:", options: ["La señalización específica en contrario (PARE, CEDA EL PASO)", "Vehículos ferroviarios y de emergencia", "Peatones que cruzan por senda peatonal", "Todas las anteriores son correctas"], correctAnswer: "Todas las anteriores son correctas" },
-    { question: "En un paso a nivel sin barreras ni señalización, la prioridad de paso es siempre de:", options: ["El vehículo que llega primero", "El tren", "El vehículo particular, por ser más ágil", "El que viene por la derecha"], correctAnswer: "El tren" },
-    { question: "Usted está saliendo de un garaje y un peatón camina por la vereda. ¿Quién tiene prioridad?", options: ["Usted, porque el peatón debe detenerse", "El peatón, siempre tiene prioridad en la acera", "Ambos deben ceder el paso mutuamente", "Usted, si toca bocina para advertir"], correctAnswer: "El peatón, siempre tiene prioridad en la acera" },
-    { question: "Si usted circula por una ruta pavimentada y otro vehículo intenta ingresar desde un camino de tierra, la prioridad es de:", options: ["El vehículo que viene por el camino de tierra", "El vehículo que ya circula por la ruta pavimentada", "El que viene por la derecha, sin importar el tipo de vía", "Se debe definir por señas"], correctAnswer: "El vehículo que ya circula por la ruta pavimentada" },
-    { question: "En una pendiente, si el paso simultáneo de dos vehículos es imposible, la prioridad la tiene:", options: ["El vehículo que desciende (baja)", "El vehículo que asciende (sube)", "El vehículo más pesado", "El vehículo más liviano"], correctAnswer: "El vehículo que asciende (sube)" },
-    { question: "Al realizar un adelantamiento en una ruta de doble mano, la prioridad la tiene:", options: ["Usted, que está adelantando", "El vehículo que circula en sentido contrario por el carril que usted está utilizando", "El vehículo que va a ser adelantado", "El más rápido de los tres"], correctAnswer: "El vehículo que circula en sentido contrario por el carril que usted está utilizando" },
-    { question: "¿Cuál es la velocidad máxima permitida en una calle de zona urbana si no hay señalización que indique otra cosa?", options: ["30 km/h", "40 km/h", "50 km/h", "60 km/h"], correctAnswer: "40 km/h" },
-    { question: "¿Cuál es la velocidad máxima permitida en una avenida si no hay señalización que indique otra cosa?", options: ["40 km/h", "50 km/h", "60 km/h", "70 km/h"], correctAnswer: "60 km/h" },
-    { question: "Una señal de forma octogonal, de fondo rojo y letras blancas con la inscripción 'PARE', ¿a qué categoría pertenece?", options: ["Preventiva", "Informativa", "Reglamentaria (o Prescriptiva)", "Transitoria"], correctAnswer: "Reglamentaria (o Prescriptiva)" },
-    { question: "Las señales de forma romboidal con fondo amarillo y símbolos negros, ¿qué función cumplen?", options: ["Informar sobre destinos y servicios", "Prohibir o restringir maniobras", "Advertir sobre peligros o riesgos en la vía", "Señalizar desvíos por obras"], correctAnswer: "Advertir sobre peligros o riesgos en la vía" },
-    { question: "Usted se encuentra con una señal circular con borde rojo, fondo blanco y el pictograma de una bicicleta tachado. ¿Qué significa?", options: ["Circulación exclusiva de bicicletas", "Prohibición de circulación de bicicletas", "Senda para ciclistas", "Estacionamiento para bicicletas"], correctAnswer: "Prohibición de circulación de bicicletas" },
-    { question: "Una señal rectangular de fondo azul con un pictograma de un teléfono, ¿qué tipo de señal es?", options: ["Reglamentaria", "Preventiva", "Informativa de servicio", "Transitoria"], correctAnswer: "Informativa de servicio" },
-    { question: "Una señal en forma de rombo de color naranja con el pictograma de un obrero trabajando, indica:", options: ["Una advertencia permanente de zona de trabajo", "Una zona de obras o trabajos temporales en la calzada", "Un cruce de peatones especial", "Fin de la zona de obras"], correctAnswer: "Una zona de obras o trabajos temporales en la calzada" },
-    { question: "La demarcación horizontal de una doble línea amarilla continua en la calzada indica que:", options: ["Se puede adelantar desde ambos carriles con precaución", "Está prohibido adelantar o cambiar de carril en ambos sentidos", "Solo puede adelantar el que circula por la derecha", "Es una zona de estacionamiento medido"], correctAnswer: "Está prohibido adelantar o cambiar de carril en ambos sentidos" },
-    { question: "Una línea de detención blanca y transversal a la calzada, ¿qué indica?", options: ["El lugar donde se debe iniciar el sobrepaso", "El lugar exacto donde deben detenerse los vehículos ante un semáforo o señal de PARE", "El comienzo de una senda peatonal", "El ancho máximo del vehículo permitido"], correctAnswer: "El lugar exacto donde deben detenerse los vehículos ante un semáforo o señal de PARE" },
-    { question: "La luz amarilla intermitente de un semáforo le indica que debe:", options: ["Detenerse como si fuera un PARE", "Avanzar con precaución", "Esperar la luz verde, porque el semáforo está por cambiar", "Acelerar para despejar el cruce"], correctAnswer: "Avanzar con precaución" },
-    { question: "Usted ve una señal triangular invertida, con borde rojo y fondo blanco. ¿Qué acción debe realizar?", options: ["Detenerse completamente", "Ceder el paso a los vehículos de la vía transversal", "Continuar con la misma velocidad", "Tocar bocina y avanzar"], correctAnswer: "Ceder el paso a los vehículos de la vía transversal" },
-    { question: "El límite de alcoholemia para un conductor de vehículo particular en Argentina es de:", options: ["0.0 gramos por litro de sangre", "0.2 gramos por litro de sangre", "0.5 gramos por litro de sangre", "0.8 gramos por litro de sangre"], correctAnswer: "0.5 gramos por litro de sangre" },
-    { question: "Conducir con fatiga o sueño es peligroso principalmente porque:", options: ["Aumenta el consumo de combustible", "Disminuye el tiempo de reacción y la capacidad de atención", "Puede dañar la suspensión del vehículo", "Genera multas aunque no se cometa otra infracción"], correctAnswer: "Disminuye el tiempo de reacción y la capacidad de atención" },
-    { question: "El uso del teléfono celular (incluso con manos libres) mientras se conduce:", options: ["Está permitido si es una llamada corta", "Está prohibido porque disminuye la atención necesaria para el manejo", "Está permitido solo en avenidas", "Solo está prohibido para enviar mensajes"], correctAnswer: "Está prohibido porque disminuye la atención necesaria para el manejo" },
-    { question: "Si usted participa en un siniestro vial, ¿está obligado a detenerse y suministrar sus datos?", options: ["No, si el daño es menor", "Solo si hay heridos", "Sí, siempre es una obligación legal", "Solo si la otra parte lo solicita expresamente"], correctAnswer: "Sí, siempre es una obligación legal" },
-    { question: "La sanción de 'inhabilitación' consiste en:", options: ["El pago de una multa económica", "La obligación de realizar un curso de reeducación", "La pérdida temporal o definitiva del derecho a conducir", "El secuestro del vehículo"], correctAnswer: "La pérdida temporal o definitiva del derecho a conducir" },
-    { question: "Negarse a realizar un control de alcoholemia:", options: ["No tiene consecuencias si no se cometió otra infracción", "Es considerado una falta leve", "Constituye una falta grave y genera una presunción de alcoholemia positiva en su contra", "Solo se penaliza si el conductor muestra signos evidentes de ebriedad"], correctAnswer: "Constituye una falta grave y genera una presunción de alcoholemia positiva en su contra" },
-    { question: "¿Cuál es la finalidad de la banda de rodamiento de un neumático?", options: ["Mejorar la estética del vehículo", "Reducir el ruido de la marcha", "Proporcionar adherencia al pavimento y evacuar agua", "Aumentar la velocidad máxima del vehículo"], correctAnswer: "Proporcionar adherencia al pavimento y evacuar agua" },
-    { question: "Un conductor principiante debe llevar un cartel visible con la letra 'P' durante los primeros:", options: ["3 meses", "6 meses", "12 meses", "24 meses"], correctAnswer: "6 meses" },
-    { question: "La documentación obligatoria para circular incluye la Licencia, la Cédula de Identificación del Vehículo y:", options: ["El título de propiedad del vehículo", "El DNI del conductor", "El comprobante de pago de la última patente", "El comprobante de seguro obligatorio vigente"], correctAnswer: "El comprobante de seguro obligatorio vigente" },
-    { question: "Si su vehículo queda inmovilizado en un túnel por una avería, ¿qué debe hacer?", options: ["Apagar todas las luces y esperar ayuda dentro del auto", "Intentar repararlo en el lugar sin importar el tráfico", "Encender las balizas, apagar el motor y, si es posible, empujar el vehículo al exterior o a una zona de seguridad", "Abandonar el vehículo y caminar por el centro del túnel para ser visto"], correctAnswer: "Encender las balizas, apagar el motor y, si es posible, empujar el vehículo al exterior o a una zona de seguridad" },
-    { question: "Una señal preventiva con el pictograma de una curva cerrada advierte sobre:", options: ["Una curva común", "Una curva de 90 grados o más cerrada de lo normal", "El inicio de un camino sinuoso", "Una rotonda"], correctAnswer: "Una curva de 90 grados o más cerrada de lo normal" },
-    { question: "Una señal informativa con un pictograma de un avión indica la proximidad de un:", options: ["Mirador", "Corredor aéreo de bajo vuelo", "Aeropuerto o aeródromo", "Museo de aviación"], correctAnswer: "Aeropuerto o aeródromo" },
-    { question: "En un camino de montaña con pendiente, si el vehículo que asciende lleva un acoplado, ¿mantiene su prioridad sobre el que desciende?", options: ["No, pierde la prioridad por llevar acoplado", "Sí, el que asciende siempre tiene prioridad, con o sin acoplado", "Solo si el que desciende no lleva acoplado", "Deben decidir por señas"], correctAnswer: "Sí, el que asciende siempre tiene prioridad, con o sin acoplado" },
-    { question: "Al circular de noche, ¿cuándo es obligatorio cambiar de luces altas a bajas?", options: ["Al entrar en una zona urbana", "Al cruzarse con otro vehículo o al circular detrás de uno", "A y B son correctas", "Nunca, siempre se deben usar las altas para ver mejor"], correctAnswer: "A y B son correctas" },
-    { question: "El color amarillo en el cordón de la vereda indica:", options: ["Prohibido estacionar y detenerse", "Prohibido estacionar, pero se permite la detención para ascenso y descenso", "Estacionamiento exclusivo para taxis", "Zona de carga y descarga"], correctAnswer: "Prohibido estacionar, pero se permite la detención para ascenso y descenso" },
-    { question: "Una señal circular con una flecha blanca diagonal, dentro de un fondo azul, indica:", options: ["Prohibido circular en diagonal", "Sentido obligatorio en diagonal", "Mantenerse en el carril", "Circulación obligatoria por el carril indicado"], correctAnswer: "Circulación obligatoria por el carril indicado" },
-    { question: "La 'imprudencia' como factor de riesgo se define como:", options: ["No saber cómo reaccionar", "Actuar de forma peligrosa o temeraria, asumiendo riesgos innecesarios", "Distraerse con el celular", "No realizar el mantenimiento del vehículo"], correctAnswer: "Actuar de forma peligrosa o temeraria, asumiendo riesgos innecesarios" },
-    { question: "La 'impericia' se refiere a:", options: ["La falta de habilidad o experiencia para ejecutar una maniobra", "Conducir de manera agresiva", "No respetar las señales de tránsito", "Exceder los límites de velocidad"], correctAnswer: "La falta de habilidad o experiencia para ejecutar una maniobra" },
-    { question: "Una señal circular con borde rojo que muestra el pictograma de una bocina tachada significa:", options: ["Prohibido usar la radio a alto volumen", "Zona de silencio hospitalario", "Prohibido el uso de la bocina o señales acústicas", "Fin de la prohibición de ruidos"], correctAnswer: "Prohibido el uso de la bocina o señales acústicas" },
-    { question: "Un matafuegos de 1kg (tipo ABC), ¿es adecuado para un automóvil particular?", options: ["No, se necesita uno de 5kg para ser efectivo", "Sí, es el tipo y tamaño reglamentario para automóviles", "Solo si el auto es a gasoil, los nafteros no lo necesitan", "No, el matafuegos es opcional en autos particulares"], correctAnswer: "Sí, es el tipo y tamaño reglamentario para automóviles" }
+    // --- BANCO DE PREGUNTAS COMPLETO Y CORREGIDO ---
+    const allQuestions = [
+        { question: "El concepto de 'conducción a la defensiva' se refiere a:", options: ["Conducir agresivamente para imponerse", "Anticiparse a los posibles errores de los demás y a las condiciones del entorno", "Ceder siempre el paso, incluso cuando se tiene prioridad", "Utilizar el vehículo solo para lo estrictamente necesario"], correctAnswer: "Anticiparse a los posibles errores de los demás y a las condiciones del entorno" },
+        { question: "En el trato con otros usuarios de la vía, el conductor debe ser:", options: ["Competitivo y rápido", "Indiferente, concentrándose solo en su propio manejo", "Cortés, solidario y respetuoso", "Rápido para no entorpecer el tránsito"], correctAnswer: "Cortés, solidario y respetuoso" },
+        { question: "El campo visual de un conductor se reduce a medida que:", options: ["Disminuye la velocidad", "Aumenta la velocidad", "Se hace de día", "El vehículo tiene más espejos"], correctAnswer: "Aumenta la velocidad" },
+        { question: "¿Cuál es el objetivo principal de la Licencia Nacional de Conducir (LNC)?", options: ["Aumentar la recaudación fiscal", "Unificar criterios y requisitos para la habilitación de conductores en todo el país", "Limitar la cantidad de vehículos en circulación", "Facilitar la compra y venta de automotores"], correctAnswer: "Unificar criterios y requisitos para la habilitación de conductores en todo el país" },
+        { question: "Para obtener la licencia de conducir por primera vez, ¿es obligatorio realizar el Curso Nacional de Educación Vial?", options: ["No, es opcional", "Sí, es de carácter obligatorio y gratuito", "Solo es obligatorio para menores de 21 años", "Solo para licencias profesionales"], correctAnswer: "Sí, es de carácter obligatorio y gratuito" },
+        { question: "Los frenos ABS son un elemento de la seguridad:", options: ["Activa, porque ayudan a evitar un siniestro", "Pasiva, porque actúan después del impacto", "Preventiva, porque alertan al conductor", "Estructural, porque forman parte del chasis"], correctAnswer: "Activa, porque ayudan a evitar un siniestro" },
+        { question: "El apoya cabezas, ¿contra qué tipo de lesión protege principalmente?", options: ["Lesiones en las piernas por el tablero", "Golpes en el cráneo contra el parabrisas", "El 'efecto latigazo' en las cervicales durante una colisión trasera", "Deslizamiento del cuerpo por debajo del cinturón"], correctAnswer: "El 'efecto latigazo' en las cervicales durante una colisión trasera" },
+        { question: "Para una conducción eficiente y un menor consumo de combustible, se recomienda:", options: ["Realizar aceleraciones y frenadas bruscas constantemente", "Mantener una velocidad uniforme y evitar cambios de marcha innecesarios", "Circular siempre en la marcha más baja posible para tener más potencia", "Llevar los neumáticos con una presión inferior a la recomendada"], correctAnswer: "Mantener una velocidad uniforme y evitar cambios de marcha innecesarios" },
+        { question: "En una encrucijada urbana sin señalizar, si dos vehículos llegan al mismo tiempo, la prioridad de paso la tiene:", options: ["El vehículo que viene por la derecha del otro", "El que viene por la izquierda", "El que circula por la calle más ancha", "El que tiene intención de girar"], correctAnswer: "El vehículo que viene por la derecha del otro" },
+        { question: "Usted se aproxima a una rotonda. ¿Quién tiene prioridad de paso?", options: ["Usted, porque va a ingresar", "El vehículo que ya se encuentra circulando dentro de la rotonda", "El vehículo que viene por su derecha, aunque aún no haya ingresado a la rotonda", "El vehículo más rápido"], correctAnswer: "El vehículo que ya se encuentra circulando dentro de la rotonda" },
+        { question: "La prioridad absoluta del vehículo que circula por la derecha se pierde ante:", options: ["La señalización específica en contrario (PARE, CEDA EL PASO)", "Vehículos ferroviarios y de emergencia", "Peatones que cruzan por senda peatonal", "Todas las anteriores son correctas"], correctAnswer: "Todas las anteriores son correctas" },
+        { question: "En un paso a nivel sin barreras ni señalización, la prioridad de paso es siempre de:", options: ["El vehículo que llega primero", "El tren", "El vehículo particular, por ser más ágil", "El que viene por la derecha"], correctAnswer: "El tren" },
+        { question: "Usted está saliendo de un garaje y un peatón camina por la vereda. ¿Quién tiene prioridad?", options: ["Usted, porque el peatón debe detenerse", "El peatón, siempre tiene prioridad en la acera", "Ambos deben ceder el paso mutuamente", "Usted, si toca bocina para advertir"], correctAnswer: "El peatón, siempre tiene prioridad en la acera" },
+        { question: "Si usted circula por una ruta pavimentada y otro vehículo intenta ingresar desde un camino de tierra, la prioridad es de:", options: ["El vehículo que viene por el camino de tierra", "El vehículo que ya circula por la ruta pavimentada", "El que viene por la derecha, sin importar el tipo de vía", "Se debe definir por señas"], correctAnswer: "El vehículo que ya circula por la ruta pavimentada" },
+        { question: "En una pendiente, si el paso simultáneo de dos vehículos es imposible, la prioridad la tiene:", options: ["El vehículo que desciende (baja)", "El vehículo que asciende (sube)", "El vehículo más pesado", "El vehículo más liviano"], correctAnswer: "El vehículo que asciende (sube)" },
+        { question: "Al realizar un adelantamiento en una ruta de doble mano, la prioridad la tiene:", options: ["Usted, que está adelantando", "El vehículo que circula en sentido contrario por el carril que usted está utilizando", "El vehículo que va a ser adelantado", "El más rápido de los tres"], correctAnswer: "El vehículo que circula en sentido contrario por el carril que usted está utilizando" },
+        { question: "¿Cuál es la velocidad máxima permitida en una calle de zona urbana si no hay señalización que indique otra cosa?", options: ["30 km/h", "40 km/h", "50 km/h", "60 km/h"], correctAnswer: "40 km/h" },
+        { question: "¿Cuál es la velocidad máxima permitida en una avenida si no hay señalización que indique otra cosa?", options: ["40 km/h", "50 km/h", "60 km/h", "70 km/h"], correctAnswer: "60 km/h" },
+        { question: "Una señal de forma octogonal, de fondo rojo y letras blancas con la inscripción 'PARE', ¿a qué categoría pertenece?", options: ["Preventiva", "Informativa", "Reglamentaria (o Prescriptiva)", "Transitoria"], correctAnswer: "Reglamentaria (o Prescriptiva)" },
+        { question: "Las señales de forma romboidal con fondo amarillo y símbolos negros, ¿qué función cumplen?", options: ["Informar sobre destinos y servicios", "Prohibir o restringir maniobras", "Advertir sobre peligros o riesgos en la vía", "Señalizar desvíos por obras"], correctAnswer: "Advertir sobre peligros o riesgos en la vía" },
+        { question: "Usted se encuentra con una señal circular con borde rojo, fondo blanco y el pictograma de una bicicleta tachado. ¿Qué significa?", options: ["Circulación exclusiva de bicicletas", "Prohibición de circulación de bicicletas", "Senda para ciclistas", "Estacionamiento para bicicletas"], correctAnswer: "Prohibición de circulación de bicicletas" },
+        { question: "Una señal rectangular de fondo azul con un pictograma de un teléfono, ¿qué tipo de señal es?", options: ["Reglamentaria", "Preventiva", "Informativa de servicio", "Transitoria"], correctAnswer: "Informativa de servicio" },
+        { question: "Una señal en forma de rombo de color naranja con el pictograma de un obrero trabajando, indica:", options: ["Una advertencia permanente de zona de trabajo", "Una zona de obras o trabajos temporales en la calzada", "Un cruce de peatones especial", "Fin de la zona de obras"], correctAnswer: "Una zona de obras o trabajos temporales en la calzada" },
+        { question: "La demarcación horizontal de una doble línea amarilla continua en la calzada indica que:", options: ["Se puede adelantar desde ambos carriles con precaución", "Está prohibido adelantar o cambiar de carril en ambos sentidos", "Solo puede adelantar el que circula por la derecha", "Es una zona de estacionamiento medido"], correctAnswer: "Está prohibido adelantar o cambiar de carril en ambos sentidos" },
+        { question: "Una línea de detención blanca y transversal a la calzada, ¿qué indica?", options: ["El lugar donde se debe iniciar el sobrepaso", "El lugar exacto donde deben detenerse los vehículos ante un semáforo o señal de PARE", "El comienzo de una senda peatonal", "El ancho máximo del vehículo permitido"], correctAnswer: "El lugar exacto donde deben detenerse los vehículos ante un semáforo o señal de PARE" },
+        { question: "La luz amarilla intermitente de un semáforo le indica que debe:", options: ["Detenerse como si fuera un PARE", "Avanzar con precaución", "Esperar la luz verde, porque el semáforo está por cambiar", "Acelerar para despejar el cruce"], correctAnswer: "Avanzar con precaución" },
+        { question: "Usted ve una señal triangular invertida, con borde rojo y fondo blanco. ¿Qué acción debe realizar?", options: ["Detenerse completamente", "Ceder el paso a los vehículos de la vía transversal", "Continuar con la misma velocidad", "Tocar bocina y avanzar"], correctAnswer: "Ceder el paso a los vehículos de la vía transversal" },
+        { question: "El límite de alcoholemia para un conductor de vehículo particular en Argentina es de:", options: ["0.0 gramos por litro de sangre", "0.2 gramos por litro de sangre", "0.5 gramos por litro de sangre", "0.8 gramos por litro de sangre"], correctAnswer: "0.5 gramos por litro de sangre" },
+        { question: "Conducir con fatiga o sueño es peligroso principalmente porque:", options: ["Aumenta el consumo de combustible", "Disminuye el tiempo de reacción y la capacidad de atención", "Puede dañar la suspensión del vehículo", "Genera multas aunque no se cometa otra infracción"], correctAnswer: "Disminuye el tiempo de reacción y la capacidad de atención" },
+        { question: "El uso del teléfono celular (incluso con manos libres) mientras se conduce:", options: ["Está permitido si es una llamada corta", "Está prohibido porque disminuye la atención necesaria para el manejo", "Está permitido solo en avenidas", "Solo está prohibido para enviar mensajes"], correctAnswer: "Está prohibido porque disminuye la atención necesaria para el manejo" },
+        { question: "Si usted participa en un siniestro vial, ¿está obligado a detenerse y suministrar sus datos?", options: ["No, si el daño es menor", "Solo si hay heridos", "Sí, siempre es una obligación legal", "Solo si la otra parte lo solicita expresamente"], correctAnswer: "Sí, siempre es una obligación legal" },
+        { question: "La sanción de 'inhabilitación' consiste en:", options: ["El pago de una multa económica", "La obligación de realizar un curso de reeducación", "La pérdida temporal o definitiva del derecho a conducir", "El secuestro del vehículo"], correctAnswer: "La pérdida temporal o definitiva del derecho a conducir" },
+        { question: "Negarse a realizar un control de alcoholemia:", options: ["No tiene consecuencias si no se cometió otra infracción", "Es considerado una falta leve", "Constituye una falta grave y genera una presunción de alcoholemia positiva en su contra", "Solo se penaliza si el conductor muestra signos evidentes de ebriedad"], correctAnswer: "Constituye una falta grave y genera una presunción de alcoholemia positiva en su contra" },
+        { question: "¿Cuál es la finalidad de la banda de rodamiento de un neumático?", options: ["Mejorar la estética del vehículo", "Reducir el ruido de la marcha", "Proporcionar adherencia al pavimento y evacuar agua", "Aumentar la velocidad máxima del vehículo"], correctAnswer: "Proporcionar adherencia al pavimento y evacuar agua" },
+        { question: "Un conductor principiante debe llevar un cartel visible con la letra 'P' durante los primeros:", options: ["3 meses", "6 meses", "12 meses", "24 meses"], correctAnswer: "6 meses" },
+        { question: "La documentación obligatoria para circular incluye la Licencia, la Cédula de Identificación del Vehículo y:", options: ["El título de propiedad del vehículo", "El DNI del conductor", "El comprobante de pago de la última patente", "El comprobante de seguro obligatorio vigente"], correctAnswer: "El comprobante de seguro obligatorio vigente" },
+        { question: "Si su vehículo queda inmovilizado en un túnel por una avería, ¿qué debe hacer?", options: ["Apagar todas las luces y esperar ayuda dentro del auto", "Intentar repararlo en el lugar sin importar el tráfico", "Encender las balizas, apagar el motor y, si es posible, empujar el vehículo al exterior o a una zona de seguridad", "Abandonar el vehículo y caminar por el centro del túnel para ser visto"], correctAnswer: "Encender las balizas, apagar el motor y, si es posible, empujar el vehículo al exterior o a una zona de seguridad" },
+        { question: "Una señal preventiva con el pictograma de una curva cerrada advierte sobre:", options: ["Una curva común", "Una curva de 90 grados o más cerrada de lo normal", "El inicio de un camino sinuoso", "Una rotonda"], correctAnswer: "Una curva de 90 grados o más cerrada de lo normal" },
+        { question: "Una señal informativa con un pictograma de un avión indica la proximidad de un:", options: ["Mirador", "Corredor aéreo de bajo vuelo", "Aeropuerto o aeródromo", "Museo de aviación"], correctAnswer: "Aeropuerto o aeródromo" },
+        { question: "En un camino de montaña con pendiente, si el vehículo que asciende lleva un acoplado, ¿mantiene su prioridad sobre el que desciende?", options: ["No, pierde la prioridad por llevar acoplado", "Sí, el que asciende siempre tiene prioridad, con o sin acoplado", "Solo si el que desciende no lleva acoplado", "Deben decidir por señas"], correctAnswer: "Sí, el que asciende siempre tiene prioridad, con o sin acoplado" },
+        { question: "Al circular de noche, ¿cuándo es obligatorio cambiar de luces altas a bajas?", options: ["Al entrar en una zona urbana", "Al cruzarse con otro vehículo o al circular detrás de uno", "A y B son correctas", "Nunca, siempre se deben usar las altas para ver mejor"], correctAnswer: "A y B son correctas" },
+        { question: "El color amarillo en el cordón de la vereda indica:", options: ["Prohibido estacionar y detenerse", "Prohibido estacionar, pero se permite la detención para ascenso y descenso", "Estacionamiento exclusivo para taxis", "Zona de carga y descarga"], correctAnswer: "Prohibido estacionar, pero se permite la detención para ascenso y descenso" },
+        { question: "Una señal circular con una flecha blanca diagonal, dentro de un fondo azul, indica:", options: ["Prohibido circular en diagonal", "Sentido obligatorio en diagonal", "Mantenerse en el carril", "Circulación obligatoria por el carril indicado"], correctAnswer: "Circulación obligatoria por el carril indicado" },
+        { question: "La 'imprudencia' como factor de riesgo se define como:", options: ["No saber cómo reaccionar", "Actuar de forma peligrosa o temeraria, asumiendo riesgos innecesarios", "Distraerse con el celular", "No realizar el mantenimiento del vehículo"], correctAnswer: "Actuar de forma peligrosa o temeraria, asumiendo riesgos innecesarios" },
+        { question: "La 'impericia' se refiere a:", options: ["La falta de habilidad o experiencia para ejecutar una maniobra", "Conducir de manera agresiva", "No respetar las señales de tránsito", "Exceder los límites de velocidad"], correctAnswer: "La falta de habilidad o experiencia para ejecutar una maniobra" },
+        { question: "Una señal circular con borde rojo que muestra el pictograma de una bocina tachada significa:", options: ["Prohibido usar la radio a alto volumen", "Zona de silencio hospitalario", "Prohibido el uso de la bocina o señales acústicas", "Fin de la prohibición de ruidos"], correctAnswer: "Prohibido el uso de la bocina o señales acústicas" },
+        { question: "Un matafuegos de 1kg (tipo ABC), ¿es adecuado para un automóvil particular?", options: ["No, se necesita uno de 5kg para ser efectivo", "Sí, es el tipo y tamaño reglamentario para automóviles", "Solo si el auto es a gasoil, los nafteros no lo necesitan", "No, el matafuegos es opcional en autos particulares"], correctAnswer: "Sí, es el tipo y tamaño reglamentario para automóviles" }
 ];
 
-// --- LÓGICA DEL SIMULADOR ---
-const startScreen = document.getElementById('start-screen');
-const quizContainer = document.getElementById('quiz-container');
-const resultsContainer = document.getElementById('results-container');
-const startBtn = document.getElementById('start-btn');
-const restartBtn = document.getElementById('restart-btn-icon');
-const closeBtn = document.getElementById('close-btn');
-
-const questionCounterElem = document.getElementById('question-counter');
-const timerElem = document.getElementById('timer');
-const questionTextElem = document.getElementById('question-text');
-const answerOptionsElem = document.getElementById('answer-options');
-const scoreTextElem = document.getElementById('score-text');
-const scoreMessageElem = document.getElementById('score-message');
-const reviewListElem = document.getElementById('review-list');
-
-let shuffledQuestions, currentQuestionIndex, score, userAnswers;
-const EXAM_LENGTH = 40;
-const TIME_LIMIT = 45 * 60; // 45 minutos en segundos
-let timerInterval;
-const USED_QUESTIONS_KEY = 'usedDrivingTestQuestions';
-
-function shuffleArray(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-    }
-}
-
-function getUsedQuestions() {
-    try {
-        const used = sessionStorage.getItem(USED_QUESTIONS_KEY);
-        return used ? JSON.parse(used) : [];
-    } catch (e) {
-        console.error("Error al leer de sessionStorage:", e);
-        return [];
-    }
-}
-
-function setUsedQuestions(questions) {
-    try {
-        const used = getUsedQuestions();
-        const newUsed = [...used, ...questions.map(q => q.question)];
-        sessionStorage.setItem(USED_QUESTIONS_KEY, JSON.stringify(newUsed));
-    } catch (e) {
-        console.error("Error al escribir en sessionStorage:", e);
-    }
-}
-
-function startQuiz() {
-    startScreen.style.display = 'none';
-    resultsContainer.style.display = 'none';
-    quizContainer.style.display = 'block';
-    closeBtn.style.display = 'block';
-
-    const usedQuestions = getUsedQuestions();
-    let availableQuestions = allQuestions.filter(q => !usedQuestions.includes(q.question));
-
-    if (availableQuestions.length < EXAM_LENGTH) {
-        console.log("Se han agotado las preguntas únicas. Reiniciando el banco de preguntas.");
-        sessionStorage.removeItem(USED_QUESTIONS_KEY);
-        availableQuestions = allQuestions;
-    }
-
-    shuffleArray(availableQuestions);
-    shuffledQuestions = availableQuestions.slice(0, EXAM_LENGTH);
-    setUsedQuestions(shuffledQuestions);
+    // --- LÓGICA DEL SIMULADOR ---
+    const startScreen = document.getElementById('start-screen');
+    const quizScreen = document.getElementById('quiz-screen');
+    const resultsScreen = document.getElementById('results-screen');
+    const startBtn = document.getElementById('start-btn');
+    const restartBtn = document.getElementById('restart-btn');
+    const closeBtn = document.getElementById('close-btn');
+    const questionCounterElem = document.getElementById('question-counter');
+    const timerElem = document.getElementById('timer');
+    const progressBar = document.getElementById('progress-bar');
+    const questionTextElem = document.getElementById('question-text');
+    const answerOptionsElem = document.getElementById('answer-options');
+    const scorePercentageElem = document.getElementById('score-percentage');
+    const resultMessageElem = document.getElementById('result-message');
+    const scoreCircleElem = document.getElementById('score-circle');
+    const correctAnswersElem = document.getElementById('correct-answers');
+    const incorrectAnswersElem = document.getElementById('incorrect-answers');
+    const totalQuestionsElem = document.getElementById('total-questions');
+    const reviewListElem = document.getElementById('review-list');
     
-    currentQuestionIndex = 0;
-    score = 0;
-    userAnswers = [];
+    let shuffledQuestions, currentQuestionIndex, score, userAnswers;
+    const EXAM_LENGTH = 40;
+    const TIME_LIMIT = 45 * 60;
+    let timerInterval;
+    const USED_QUESTIONS_KEY = 'usedDrivingTestQuestions';
 
-    startTimer();
-    showQuestion();
-}
-
-function startTimer() {
-    let timeLeft = TIME_LIMIT;
-    clearInterval(timerInterval); 
-
-    const updateTimer = () => {
-        timeLeft--;
-        const minutes = Math.floor(timeLeft / 60);
-        const seconds = timeLeft % 60;
-        timerElem.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-        if (timeLeft <= 0) {
-            clearInterval(timerInterval);
-            alert("¡Se acabó el tiempo!");
-            showResults();
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
         }
-    };
+    }
+
+    function switchScreen(screen) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        screen.classList.add('active');
+    }
     
-    updateTimer(); 
-    timerInterval = setInterval(updateTimer, 1000);
-}
+    function startQuiz() {
+        switchScreen(quizScreen);
 
-function showQuestion() {
-    resetState();
-    const currentQuestion = shuffledQuestions[currentQuestionIndex];
-    questionCounterElem.textContent = `Pregunta ${currentQuestionIndex + 1} de ${EXAM_LENGTH}`;
-    questionTextElem.textContent = currentQuestion.question;
+        let availableQuestions = allQuestions.filter(q => !getUsedQuestions().includes(q.question));
+        if (availableQuestions.length < EXAM_LENGTH) {
+            sessionStorage.removeItem(USED_QUESTIONS_KEY);
+            availableQuestions = allQuestions;
+        }
 
-    currentQuestion.options.forEach(optionText => {
-        const optionElement = document.createElement('div');
-        optionElement.classList.add('option');
-        optionElement.textContent = optionText;
-        optionElement.addEventListener('click', (e) => selectAnswer(e, optionText));
-        answerOptionsElem.appendChild(optionElement);
-    });
-}
+        shuffleArray(availableQuestions);
+        shuffledQuestions = availableQuestions.slice(0, EXAM_LENGTH);
+        
+        currentQuestionIndex = 0;
+        score = 0;
+        userAnswers = [];
+        
+        startTimer();
+        showQuestion();
+    }
 
-function resetState() {
-    answerOptionsElem.innerHTML = '';
-    if (document.activeElement) document.activeElement.blur();
-}
+    function startTimer() {
+        let timeLeft = TIME_LIMIT;
+        clearInterval(timerInterval);
 
-function selectAnswer(event, selectedOptionText) {
-    if (document.querySelector('.option.selected')) return;
-    
-    const selectedOptionElement = event.currentTarget;
-    selectedOptionElement.classList.add('selected');
+        timerInterval = setInterval(() => {
+            timeLeft--;
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            timerElem.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                alert("¡Se acabó el tiempo!");
+                showResults();
+            }
+        }, 1000);
+    }
 
-    document.querySelectorAll('.option').forEach(opt => {
-        opt.style.pointerEvents = 'none';
-    });
+    function showQuestion() {
+        resetState();
+        const currentQuestion = shuffledQuestions[currentQuestionIndex];
+        questionCounterElem.textContent = `Pregunta ${currentQuestionIndex + 1} de ${EXAM_LENGTH}`;
+        progressBar.style.width = `${((currentQuestionIndex + 1) / EXAM_LENGTH) * 100}%`;
+        questionTextElem.textContent = currentQuestion.question;
 
-    const currentQuestion = shuffledQuestions[currentQuestionIndex];
-    const isCorrect = selectedOptionText === currentQuestion.correctAnswer;
-    
-    if (isCorrect) score++;
+        currentQuestion.options.forEach(optionText => {
+            const optionElement = document.createElement('div');
+            optionElement.classList.add('option');
+            optionElement.textContent = optionText;
+            optionElement.addEventListener('click', (e) => selectAnswer(e, optionElement, optionText));
+            answerOptionsElem.appendChild(optionElement);
+        });
+    }
 
-    userAnswers.push({
-        question: currentQuestion.question,
-        userAnswer: selectedOptionText,
-        correctAnswer: currentQuestion.correctAnswer,
-        isCorrect: isCorrect
-    });
+    function resetState() {
+        answerOptionsElem.innerHTML = '';
+        if (document.activeElement) document.activeElement.blur();
+    }
 
-    setTimeout(() => {
-        currentQuestionIndex++;
-        if (currentQuestionIndex < EXAM_LENGTH) {
-            showQuestion();
+    function selectAnswer(event, selectedOptionElement, selectedOptionText) {
+        if (selectedOptionElement.classList.contains('correct') || selectedOptionElement.classList.contains('incorrect')) return;
+
+        const currentQuestion = shuffledQuestions[currentQuestionIndex];
+        const isCorrect = selectedOptionText === currentQuestion.correctAnswer;
+
+        if (isCorrect) {
+            selectedOptionElement.classList.add('correct');
+            score++;
         } else {
-            clearInterval(timerInterval);
-            showResults();
+            selectedOptionElement.classList.add('incorrect');
+            // Muestra la correcta
+            Array.from(answerOptionsElem.children).forEach(opt => {
+                if (opt.textContent === currentQuestion.correctAnswer) {
+                    opt.classList.add('correct');
+                }
+            });
         }
-    }, 400);
-}
 
-function showResults() {
-    quizContainer.style.display = 'none';
-    resultsContainer.style.display = 'block';
-    closeBtn.style.display = 'none';
-    const finalScore = Math.round((score / EXAM_LENGTH) * 100);
-    scoreTextElem.textContent = `${finalScore} Puntos`;
-    reviewListElem.innerHTML = '';
+        userAnswers.push({ question: currentQuestion.question, userAnswer: selectedOptionText, correctAnswer: currentQuestion.correctAnswer, isCorrect });
+        
+        document.querySelectorAll('.option').forEach(opt => opt.classList.add('disabled'));
 
-    if (finalScore >= 70) {
-        scoreTextElem.classList.add('score-pass');
-        scoreMessageElem.textContent = '¡Felicitaciones, has APROBADO!';
-    } else {
-        scoreTextElem.classList.add('score-fail');
-        scoreMessageElem.textContent = 'Has DESAPROBADO. ¡Sigue practicando!';
+        setTimeout(() => {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < EXAM_LENGTH) {
+                showQuestion();
+            } else {
+                clearInterval(timerInterval);
+                showResults();
+            }
+        }, 1200);
     }
-    
-    userAnswers.forEach((answer, index) => {
-        const li = document.createElement('li');
-        li.classList.add(answer.isCorrect ? 'correct' : 'incorrect');
-        let reviewHTML = `<div class="question-review">${index + 1}. ${answer.question}</div>`;
-        if (answer.isCorrect) {
-            reviewHTML += `<div class="answer-review">✔️ Tu respuesta: ${answer.userAnswer}</div>`;
+
+    function showResults() {
+        switchScreen(resultsScreen);
+        const finalScore = Math.round((score / EXAM_LENGTH) * 100);
+        
+        scorePercentageElem.textContent = `${finalScore}%`;
+        correctAnswersElem.textContent = score;
+        incorrectAnswersElem.textContent = EXAM_LENGTH - score;
+        totalQuestionsElem.textContent = EXAM_LENGTH;
+        reviewListElem.innerHTML = '';
+
+        if (finalScore >= 75) { // Umbral de aprobación común
+            resultMessageElem.textContent = '¡Excelente! Has aprobado el examen.';
+            scoreCircleElem.classList.add('pass');
+            scoreCircleElem.classList.remove('fail');
         } else {
-            reviewHTML += `<div class="answer-review">❌ Tu respuesta: ${answer.userAnswer}</div>`;
-            reviewHTML += `<div class="answer-review">Respuesta correcta: ${answer.correctAnswer}</div>`;
+            resultMessageElem.textContent = 'No has alcanzado la puntuación necesaria. ¡Sigue practicando!';
+            scoreCircleElem.classList.add('fail');
+            scoreCircleElem.classList.remove('pass');
         }
-        li.innerHTML = reviewHTML;
-        reviewListElem.appendChild(li);
-    });
-}
-
-function goHome() {
-    clearInterval(timerInterval);
-    resultsContainer.style.display = 'none';
-    quizContainer.style.display = 'none';
-    closeBtn.style.display = 'none';
-    startScreen.style.display = 'block';
-}
-
-startBtn.addEventListener('click', startQuiz);
-restartBtn.addEventListener('click', startQuiz);
-closeBtn.addEventListener('click', () => {
-    if (confirm("¿Estás seguro de que quieres abandonar el examen? Tu progreso se perderá.")) {
-        goHome();
+        
+        userAnswers.forEach((answer, index) => {
+            const li = document.createElement('li');
+            li.classList.add(answer.isCorrect ? 'correct' : 'incorrect');
+            let reviewHTML = `<div class="question-review">${index + 1}. ${answer.question}</div>`;
+            if (answer.isCorrect) {
+                reviewHTML += `<div class="answer-review">✔️ Tu respuesta: ${answer.userAnswer}</div>`;
+            } else {
+                reviewHTML += `<div class="answer-review">❌ Tu respuesta: ${answer.userAnswer}</div>`;
+                reviewHTML += `<div class="answer-review">Respuesta correcta: ${answer.correctAnswer}</div>`;
+            }
+            li.innerHTML = reviewHTML;
+            reviewListElem.appendChild(li);
+        });
+        
+        // Guardar las preguntas de este examen para no repetirlas
+        setUsedQuestions(shuffledQuestions);
     }
-});
+
+    startBtn.addEventListener('click', startQuiz);
+    restartBtn.addEventListener('click', startQuiz);
 </script>
 </body>
 </html>
