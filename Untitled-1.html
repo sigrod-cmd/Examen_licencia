@@ -3,16 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador de Examen de Conducir v5.0 - Argentina</title>
+    <title>Simulador Élite de Examen de Conducir - Argentina</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
         
         :root {
-            --primary-color: #007BFF; --primary-hover-color: #0056b3;
-            --success-color: #28a745; --danger-color: #dc3545;
-            --background-color: #f4f7f9; --surface-color: #ffffff;
-            --text-primary-color: #212529; --text-secondary-color: #6c757d;
-            --border-color: #dee2e6; --border-radius: 12px;
+            --primary-color: #007BFF;
+            --primary-hover-color: #0056b3;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --background-color: #f4f7f9;
+            --surface-color: #ffffff;
+            --text-primary-color: #212529;
+            --text-secondary-color: #6c757d;
+            --border-color: #dee2e6;
+            --border-radius: 12px;
             --box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
         }
 
@@ -28,6 +33,7 @@
         #start-screen p { font-size: 1.1em; line-height: 1.6; margin: 20px 0; }
         .btn { background-color: var(--primary-color); color: white; border: none; padding: 15px 35px; font-size: 1.1em; border-radius: var(--border-radius); cursor: pointer; transition: all 0.3s ease; font-weight: 700; display: inline-block; text-decoration: none; }
         .btn:hover { background-color: var(--primary-hover-color); transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0, 123, 255, 0.2); }
+        #quiz-screen { display: none; }
         .quiz-header { margin-bottom: 20px; position: relative; }
         #progress-bar-container { width: 100%; height: 8px; background-color: #e9ecef; border-radius: 4px; overflow: hidden; margin-bottom: 15px; }
         #progress-bar { width: 0%; height: 100%; background-color: var(--primary-color); transition: width 0.4s ease-in-out; }
@@ -42,8 +48,8 @@
         .option.disabled { cursor: not-allowed; }
         .option.disabled:not(.correct):not(.incorrect) { opacity: 0.6; }
         @media (hover: hover) and (pointer: fine) { .option:not(.disabled):hover { transform: translateY(-2px); border-color: var(--primary-color); box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05); } }
-        #results-screen h2 { font-size: 1.8em; margin-bottom: 10px; }
-        #results-screen p { font-size: 1.2em; color: var(--text-secondary-color); margin-bottom: 20px; }
+        #results-container h2 { font-size: 1.8em; margin-bottom: 10px; }
+        #results-container p { font-size: 1.2em; color: var(--text-secondary-color); margin-bottom: 20px; }
         #score-display { display: flex; justify-content: center; align-items: center; gap: 30px; margin: 30px 0; flex-wrap: wrap; }
         .score-circle { width: 120px; height: 120px; border-radius: 50%; display: flex; justify-content: center; align-items: center; flex-direction: column; font-weight: 700; }
         .score-circle.pass { background-color: #28a74520; color: var(--success-color); }
@@ -71,10 +77,6 @@
             .quiz-info { font-size: 0.9em; }
         }
     </style>
-
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4729505477993911"
-     crossorigin="anonymous"></script>
-     
 </head>
 <body>
     <div class="main-container">
@@ -130,7 +132,7 @@
     </div>
 
 <script>
-    // --- BANCO DE PREGUNTAS MASIVO Y VALIDADO ---
+    // --- BANCO DE PREGUNTAS MASIVO Y COMPLETO (>200 PREGUNTAS) ---
     const allQuestions = [
         { id: 1, question: "El concepto de 'conducción a la defensiva' se refiere a:", options: ["Conducir agresivamente para imponerse", "Anticiparse a los posibles errores de los demás y a las condiciones del entorno", "Ceder siempre el paso, incluso cuando se tiene prioridad", "Utilizar el vehículo solo para lo estrictamente necesario"], correctAnswer: "Anticiparse a los posibles errores de los demás y a las condiciones del entorno" },
         { id: 2, question: "En el trato con otros usuarios de la vía, el conductor debe ser:", options: ["Competitivo y rápido", "Indiferente, concentrándose solo en su propio manejo", "Cortés, solidario y respetuoso", "Rápido para no entorpecer el tránsito"], correctAnswer: "Cortés, solidario y respetuoso" },
@@ -353,193 +355,220 @@
         
     ];
 
-    // --- LÓGICA DEL SIMULADOR (REESCRITA) ---
-    document.addEventListener('DOMContentLoaded', () => {
-        const dom = {
-            startScreen: document.getElementById('start-screen'),
-            quizScreen: document.getElementById('quiz-screen'),
-            resultsScreen: document.getElementById('results-screen'),
-            startBtn: document.getElementById('start-btn'),
-            restartBtn: document.getElementById('restart-btn'),
-            questionCounter: document.getElementById('question-counter'),
-            timer: document.getElementById('timer'),
-            errorsCounter: document.getElementById('errors-counter'),
-            progressBar: document.getElementById('progress-bar'),
-            questionText: document.getElementById('question-text'),
-            answerOptions: document.getElementById('answer-options'),
-            resultMessage: document.getElementById('result-message'),
-            scorePercentage: document.getElementById('score-percentage'),
-            scoreCircle: document.getElementById('score-circle'),
-            correctAnswers: document.getElementById('correct-answers'),
-            incorrectAnswers: document.getElementById('incorrect-answers'),
-            totalQuestionsSummary: document.getElementById('total-questions-summary'),
-            reviewList: document.getElementById('review-list')
+    // --- LÓGICA DEL SIMULADOR ---
+    const startScreen = document.getElementById('start-screen');
+    const quizScreen = document.getElementById('quiz-screen');
+    const resultsScreen = document.getElementById('results-screen');
+    const startBtn = document.getElementById('start-btn');
+    const restartBtn = document.getElementById('restart-btn');
+    
+    const questionCounterElem = document.getElementById('question-counter');
+    const timerElem = document.getElementById('timer');
+    const errorsCounterElem = document.getElementById('errors-counter');
+    const progressBar = document.getElementById('progress-bar');
+    const questionTextElem = document.getElementById('question-text');
+    const answerOptionsElem = document.getElementById('answer-options');
+    const scorePercentageElem = document.getElementById('score-percentage');
+    const resultMessageElem = document.getElementById('result-message');
+    const scoreCircleElem = document.getElementById('score-circle');
+    const correctAnswersElem = document.getElementById('correct-answers');
+    const incorrectAnswersElem = document.getElementById('incorrect-answers');
+    const totalQuestionsElem = document.getElementById('total-questions-summary');
+    const reviewListElem = document.getElementById('review-list');
+    
+    let currentQuestions = [];
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let errors = 0;
+    let userAnswers = [];
+    let timerInterval;
+    const EXAM_LENGTH = 70;
+    const MAX_ERRORS = 7;
+    const TIME_LIMIT = 45 * 60;
+    
+    let usedIndexes = new Set(JSON.parse(sessionStorage.getItem('usedIndexes')) || []);
+
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+    }
+
+    function switchScreen(screen) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        screen.classList.add('active');
+    }
+    
+    function getNewQuestions() {
+        let allPossibleIndexes = Array.from(allQuestions.keys());
+        let availableIndexes = allPossibleIndexes.filter(index => !usedIndexes.has(index));
+
+        if (availableIndexes.length < EXAM_LENGTH) {
+            usedIndexes.clear();
+            availableIndexes = allPossibleIndexes;
+        }
+
+        shuffleArray(availableIndexes);
+        const newQuestionIndexes = availableIndexes.slice(0, EXAM_LENGTH);
+        
+        newQuestionIndexes.forEach(index => usedIndexes.add(index));
+        sessionStorage.setItem('usedIndexes', JSON.stringify(Array.from(usedIndexes)));
+        
+        return newQuestionIndexes.map(index => allQuestions[index]);
+    }
+    
+    function startQuiz() {
+        switchScreen(quizScreen);
+        
+        currentQuestions = getNewQuestions();
+        currentQuestionIndex = 0;
+        score = 0;
+        errors = 0;
+        userAnswers = [];
+        
+        updateErrorsCounter();
+        startTimer();
+        showQuestion();
+    }
+    
+    function startTimer() {
+        let timeLeft = TIME_LIMIT;
+        clearInterval(timerInterval); 
+        
+        const updateTimer = () => {
+            if (timeLeft < 0) {
+                clearInterval(timerInterval);
+                showResults("¡Se acabó el tiempo!");
+                return;
+            }
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            timerElem.textContent = `Tiempo: ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            timeLeft--;
         };
-
-        let state = {};
-        let timerInterval;
-        const EXAM_LENGTH = 70;
-        const MAX_ERRORS = 7;
-        const TIME_LIMIT = 45 * 60;
-
-        function shuffleArray(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-            return array;
-        }
-
-        function switchScreen(screenElement) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            screenElement.classList.add('active');
-        }
         
-        function init() {
-            state = {
-                questions: [],
-                currentIndex: 0,
-                score: 0,
-                errors: 0,
-                userAnswers: [],
-                timeLeft: TIME_LIMIT,
-                isFinished: false
-            };
-            
-            const shuffled = shuffleArray([...allQuestions]);
-            state.questions = shuffled.slice(0, EXAM_LENGTH);
+        updateTimer(); 
+        timerInterval = setInterval(updateTimer, 1000);
+    }
+    
+    function updateErrorsCounter() {
+        errorsCounterElem.innerHTML = `Errores: <span style="color: var(--danger-color);">${errors} / ${MAX_ERRORS}</span>`;
+    }
 
-            switchScreen(dom.quizScreen);
-            startTimer();
-            renderQuestion();
+    function showQuestion() {
+        resetState();
+        if (currentQuestionIndex >= currentQuestions.length) {
+            showResults();
+            return;
         }
+        const currentQuestion = currentQuestions[currentQuestionIndex];
         
-        function startTimer() {
-            clearInterval(timerInterval);
-            state.timeLeft = TIME_LIMIT;
-            timerInterval = setInterval(() => {
-                state.timeLeft--;
-                renderTimer();
-                if (state.timeLeft < 0) {
-                    endQuiz("¡Se acabó el tiempo!");
+        questionCounterElem.textContent = `Pregunta ${currentQuestionIndex + 1} de ${EXAM_LENGTH}`;
+        progressBar.style.width = `${((currentQuestionIndex) / EXAM_LENGTH) * 100}%`;
+        questionTextElem.textContent = currentQuestion.question;
+
+        currentQuestion.options.forEach(optionText => {
+            const optionElement = document.createElement('div');
+            optionElement.classList.add('option');
+            optionElement.textContent = optionText;
+            optionElement.addEventListener('click', (e) => selectAnswer(optionElement, optionText));
+            answerOptionsElem.appendChild(optionElement);
+        });
+    }
+
+    function resetState() {
+        answerOptionsElem.innerHTML = '';
+        if (document.activeElement) document.activeElement.blur();
+    }
+
+    function selectAnswer(selectedOptionElement, selectedOptionText) {
+        if (document.querySelector('.option.correct, .option.incorrect')) return;
+        
+        const currentQuestion = currentQuestions[currentQuestionIndex];
+        const isCorrect = selectedOptionText === currentQuestion.correctAnswer;
+        
+        selectedOptionElement.classList.add(isCorrect ? 'correct' : 'incorrect');
+        if (isCorrect) {
+            score++;
+        } else {
+            errors++;
+            updateErrorsCounter();
+            Array.from(answerOptionsElem.children).forEach(opt => {
+                if (opt.textContent === currentQuestion.correctAnswer) {
+                    opt.classList.add('correct');
                 }
-            }, 1000);
-        }
-
-        function renderTimer() {
-            const minutes = Math.floor(state.timeLeft / 60);
-            const seconds = state.timeLeft % 60;
-            dom.timer.textContent = `Tiempo: ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-        }
-
-        function renderQuestion() {
-            if (state.currentIndex >= EXAM_LENGTH) {
-                endQuiz();
-                return;
-            }
-
-            const currentQuestion = state.questions[state.currentIndex];
-            dom.questionCounter.textContent = `Pregunta ${state.currentIndex + 1} de ${EXAM_LENGTH}`;
-            dom.progressBar.style.width = `${((state.currentIndex) / EXAM_LENGTH) * 100}%`;
-            dom.errorsCounter.innerHTML = `Errores: <span style="color: var(--danger-color);">${state.errors} / ${MAX_ERRORS}</span>`;
-            dom.questionText.textContent = currentQuestion.question;
-            dom.answerOptions.innerHTML = '';
-
-            currentQuestion.options.forEach(optionText => {
-                const optionElement = document.createElement('div');
-                optionElement.classList.add('option');
-                optionElement.textContent = optionText;
-                optionElement.addEventListener('click', () => handleAnswer(optionElement, optionText));
-                dom.answerOptions.appendChild(optionElement);
             });
         }
+        
+        userAnswers.push({ question: currentQuestion.question, userAnswer: selectedOptionText, correctAnswer: currentQuestion.correctAnswer, isCorrect: isCorrect });
+        document.querySelectorAll('.option').forEach(opt => opt.classList.add('disabled'));
 
-        function handleAnswer(selectedElement, selectedText) {
-            if (state.isFinished) return;
-            
-            const currentQuestion = state.questions[state.currentIndex];
-            const isCorrect = selectedText === currentQuestion.correctAnswer;
-
-            selectedElement.classList.add(isCorrect ? 'correct' : 'incorrect');
-            
-            if (isCorrect) {
-                state.score++;
-            } else {
-                state.errors++;
-                updateErrorsCounter();
-                Array.from(dom.answerOptions.children).forEach(opt => {
-                    if (opt.textContent === currentQuestion.correctAnswer) {
-                        opt.classList.add('correct');
-                    }
-                });
-            }
-            
-            state.userAnswers.push({ question: currentQuestion.question, userAnswer: selectedText, correctAnswer: currentQuestion.correctAnswer, isCorrect: isCorrect });
-            document.querySelectorAll('.option').forEach(opt => opt.classList.add('disabled'));
-
-            if (state.errors >= MAX_ERRORS) {
-                setTimeout(() => {
-                    endQuiz(`Desaprobado por alcanzar el límite de ${MAX_ERRORS} errores.`);
-                }, 1200);
-                return;
-            }
-            
+        if (errors >= MAX_ERRORS) {
+            clearInterval(timerInterval);
             setTimeout(() => {
-                state.currentIndex++;
-                renderQuestion();
+                showResults(`Desaprobado por alcanzar el límite de ${MAX_ERRORS} errores.`);
             }, 1200);
+            return;
         }
 
-        function updateErrorsCounter() {
-            dom.errorsCounter.innerHTML = `Errores: <span style="color: var(--danger-color);">${state.errors} / ${MAX_ERRORS}</span>`;
-        }
-
-        function endQuiz(reason = "") {
-            state.isFinished = true;
-            clearInterval(timerInterval);
-            switchScreen(dom.resultsScreen);
-            dom.progressBar.style.width = '100%';
-            
-            const answeredQuestions = state.userAnswers.length;
-            const finalScore = answeredQuestions > 0 ? Math.round((state.score / answeredQuestions) * 100) : 0;
-
-            dom.scorePercentage.textContent = `${finalScore}%`;
-            dom.correctAnswers.textContent = state.score;
-            dom.incorrectAnswers.textContent = state.errors;
-            dom.totalQuestionsSummary.textContent = answeredQuestions;
-            dom.reviewList.innerHTML = '';
-            
-            if (reason) {
-                dom.resultMessage.textContent = reason;
-                dom.scoreCircle.className = 'score-circle fail';
+        setTimeout(() => {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < EXAM_LENGTH) {
+                showQuestion();
             } else {
-                if (state.errors < MAX_ERRORS) {
-                     dom.resultMessage.textContent = '¡Examen Finalizado! Has Aprobado.';
-                     dom.scoreCircle.className = 'score-circle pass';
-                } else {
-                     dom.resultMessage.textContent = 'Examen Finalizado. No has alcanzado la puntuación necesaria.';
-                     dom.scoreCircle.className = 'score-circle fail';
-                }
+                clearInterval(timerInterval);
+                showResults();
             }
-            
-            state.userAnswers.forEach((answer, index) => {
-                const li = document.createElement('li');
-                li.classList.add(answer.isCorrect ? 'correct' : 'incorrect');
-                let reviewHTML = `<div class="question-review">${index + 1}. ${answer.question}</div>`;
-                if (answer.isCorrect) {
-                    reviewHTML += `<div class="answer-review">✔️ Tu respuesta: ${answer.userAnswer}</div>`;
-                } else {
-                    reviewHTML += `<div class="answer-review">❌ Tu respuesta: ${answer.userAnswer}</div>`;
-                    reviewHTML += `<div class="answer-review">Respuesta correcta: ${answer.correctAnswer}</div>`;
-                }
-                li.innerHTML = reviewHTML;
-                dom.reviewList.appendChild(li);
-            });
-        }
+        }, 1200);
+    }
+    
+    function showResults(reason = "") {
+        switchScreen(resultsScreen);
+        progressBar.style.width = '100%';
+        const answeredQuestions = userAnswers.length;
+        const finalScore = answeredQuestions > 0 ? Math.round((score / answeredQuestions) * 100) : 0;
+        
+        scorePercentageElem.textContent = `${finalScore}%`;
+        correctAnswersElem.textContent = score;
+        incorrectAnswersElem.textContent = errors;
+        totalQuestionsElem.textContent = answeredQuestions;
+        reviewListElem.innerHTML = '';
 
-        dom.startBtn.addEventListener('click', init);
-        dom.restartBtn.addEventListener('click', init);
-    });
+        if (reason) {
+            resultMessageElem.textContent = reason;
+            scoreCircleElem.classList.add('fail');
+            scoreCircleElem.classList.remove('pass');
+        } else {
+            const approvalScore = Math.ceil(((EXAM_LENGTH - MAX_ERRORS) / EXAM_LENGTH) * 100);
+            if (errors < MAX_ERRORS) {
+                 resultMessageElem.textContent = '¡Examen Finalizado! Has Aprobado.';
+                 scoreCircleElem.classList.add('pass');
+                 scoreCircleElem.classList.remove('fail');
+            } else {
+                 resultMessageElem.textContent = 'Examen Finalizado. No has alcanzado la puntuación necesaria.';
+                 scoreCircleElem.classList.add('fail');
+                 scoreCircleElem.classList.remove('pass');
+            }
+        }
+        
+        userAnswers.forEach((answer, index) => {
+            const li = document.createElement('li');
+            li.classList.add(answer.isCorrect ? 'correct' : 'incorrect');
+            let reviewHTML = `<div class="question-review">${index + 1}. ${answer.question}</div>`;
+            if (answer.isCorrect) {
+                reviewHTML += `<div class="answer-review">✔️ Tu respuesta: ${answer.userAnswer}</div>`;
+            } else {
+                reviewHTML += `<div class="answer-review">❌ Tu respuesta: ${answer.userAnswer}</div>`;
+                reviewHTML += `<div class="answer-review">Respuesta correcta: ${answer.correctAnswer}</div>`;
+            }
+            li.innerHTML = reviewHTML;
+            reviewListElem.appendChild(li);
+        });
+    }
+
+    startBtn.addEventListener('click', startQuiz);
+    restartBtn.addEventListener('click', startQuiz);
 </script>
 </body>
 </html>
